@@ -12,10 +12,10 @@ global user minyangWin;
 */
 
 if strmatch("$user","minyang"){;
-global my_projdir "/home/mlee/Documents/projects/new-project-templates";
+global my_projdir "/home/mlee/Documents/projects/READ-SSB-Lee-MRIP-BLAST";
 };
 if strmatch("$user","minyangWin"){;
-global my_projdir "C:/Users/Min-Yang.Lee/Documents/new-project-templates";
+global my_projdir "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST";
 
 };
 

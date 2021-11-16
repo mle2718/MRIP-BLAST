@@ -12,14 +12,14 @@ global user minyangWin;
 
 
 if strmatch("$user","minyang"){;
-global my_projdir "/home/mlee/Documents/projects/project_templates";
+global my_projdir "/home/mlee/Documents/projects/READ-SSB-Lee-MRIP-BLAST";
 quietly do "/home/mlee/Documents/Workspace/technical folder/do file scraps/odbc_connection_macros.do";
 global oracle_cxn "conn("$mysole_conn") lower";
 };
 
 /*minyangWin is setup to connect to oracle yet */
 if strmatch("$user","minyangWin"){;
-global my_projdir "C:/Users/Min-Yang.Lee/Documents/new-project-templates";
+global my_projdir "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST";
 quietly do "C:/Users/Min-Yang.Lee/Documents/common/odbc_setup_macros.do";
 global oracle_cxn " $mysole_conn lower";
 
@@ -32,6 +32,8 @@ global extraction_code "${extract_process}/extraction";
 global processing_code "${extract_process}/processing";
 global analysis_code "${my_codedir}/analysis";
 global R_code "${my_projdir}/R_code";
+global SAS_code "${my_projdir}/SAS_code";
+
 global my_adopath "${my_codedir}/ado";
 
 
@@ -68,4 +70,8 @@ adopath + $my_adopath ;
 local date: display %td_CCYY_NN_DD date(c(current_date), "DMY");
 global today_date_string = subinstr(trim("`date'"), " " , "_", .);
 global vintage_string $today_date_string;
+
+
+/* subfolder for location of mrip data */
+global mrip_estim_pub_2018 "products/mrip_estim/Public_data_cal2018";
 
