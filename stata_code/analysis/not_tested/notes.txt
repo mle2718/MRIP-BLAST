@@ -1,0 +1,4 @@
+The files in this folder are useful for looking at the data.
+I have copied them over from previous versions, but I have not verified that they work.
+
+They are probably pointing at the wrong directories.
