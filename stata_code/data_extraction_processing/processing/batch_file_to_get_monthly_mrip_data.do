@@ -30,11 +30,11 @@ CCCCCCCCCCCCCCCC
 	CHECK for missing waves in the "ab1_lengths", catch totals, catch frequencies.
  */
 /*Set up the catchlist, triplist, and b2list global macros. These hold the filenames that are needed to figure out the catch, length-frequency, trips, and other things.*/
-local date: display %td_CCYY_NN_DD date(c(current_date), "DMY")
-global today_date_string = subinstr(trim("`date'"), " " , "_", .)
 
-global my_outputdir "${data_main}/MRIP_$today_date_string/monthly"
+
+global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 capture mkdir "$my_outputdir"
+
 
 
 
@@ -46,6 +46,7 @@ set matsize 10000
 /********************************************************************************/
 /********************************************************************************/
 global working_year  2019
+global working_year  2020
 local year $working_year
 global wavelist 1 2 3 4 5 6
 global species1 "atlanticcod"
