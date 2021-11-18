@@ -233,8 +233,17 @@ do "${processing_code}/monthly/haddock_directed_trips_by_month.do"
 
 
 
+/* caught/targeted haddock or caught cod by wave */
+do "${processing_code}/monthly/cod_monthly_weight_ab1b2.do"
 
 
+
+
+
+
+
+/* caught/targeted haddock or caught cod by wave */
+do "${processing_code}/monthly/haddock_monthly_weight_ab1b2.do"
 
 
 
