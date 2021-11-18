@@ -64,6 +64,7 @@ set matsize 10000
 /********************************************************************************/
 global working_year  2019
 global working_year  2020
+global working_year  2021
 
 local year $working_year
 global wavelist 1 2 3 4 5 6
