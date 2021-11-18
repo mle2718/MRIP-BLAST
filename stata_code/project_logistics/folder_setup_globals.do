@@ -12,16 +12,18 @@ global user minyangWin;
 
 
 if strmatch("$user","minyang"){;
-global my_projdir "/home/mlee/Documents/projects/READ-SSB-Lee-MRIP-BLAST";
-quietly do "/home/mlee/Documents/Workspace/technical folder/do file scraps/odbc_connection_macros.do";
-global oracle_cxn "conn("$mysole_conn") lower";
+	global my_projdir "/home/mlee/Documents/projects/READ-SSB-Lee-MRIP-BLAST";
+	global BLAST_Data "/home/mlee/Documents/projects/READ-SSB-Lee-BLAST";
+	quietly do "/home/mlee/Documents/Workspace/technical folder/do file scraps/odbc_connection_macros.do";
+	global oracle_cxn "conn("$mysole_conn") lower";
 };
 
 /*minyangWin is setup to connect to oracle yet */
 if strmatch("$user","minyangWin"){;
-global my_projdir "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST";
-quietly do "C:/Users/Min-Yang.Lee/Documents/common/odbc_setup_macros.do";
-global oracle_cxn " $mysole_conn lower";
+	global my_projdir "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST";
+	global BLAST_Data "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-BLAST";
+	quietly do "C:/Users/Min-Yang.Lee/Documents/common/odbc_setup_macros.do";
+	global oracle_cxn " $mysole_conn lower";
 
 };
 
@@ -65,6 +67,9 @@ global my_tables "${my_projdir}/tables" ;
 /* add the programs in $my_adopath to the adopath*/
 adopath + $my_adopath ;
 
+/* older for location of mrip data */
+global mrip_estim_pub_2018 "products/mrip_estim/Public_data_cal2018";
+
 
 /*set the date field */
 local date: display %td_CCYY_NN_DD date(c(current_date), "DMY");
@@ -72,6 +77,7 @@ global today_date_string = subinstr(trim("`date'"), " " , "_", .);
 global vintage_string $today_date_string;
 
 
-/* subfolder for location of mrip data */
-global mrip_estim_pub_2018 "products/mrip_estim/Public_data_cal2018";
+di "$vintage_string";
+folder_vintage_lookup_and_reset;
+
 
