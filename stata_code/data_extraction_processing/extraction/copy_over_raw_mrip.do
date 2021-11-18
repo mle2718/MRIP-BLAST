@@ -58,17 +58,17 @@ capture ! "$stattransfer" "`sourcedir'/trip_`year'`wave'.sas7bdat" "${data_raw}/
 
 */
 
-local mylist: dir ${data_raw} files "*.dta"
+local mylist: dir "${data_raw}" files "*.dta"
 
 
 foreach file of local mylist{
-use `file', clear
+use ${data_raw}/`file', clear
 renvars, lower
-save `file', replace emptyok
+save ${data_raw}/`file', replace emptyok
 qui count
 
 if r(N)==0{
-rm `file'
+rm ${data_raw}/`file'
 }
 }
 
