@@ -3,42 +3,30 @@ It also aggregates everything into the proper format for the recreational bioeco
 It's quite awesome.
 
 
+
 Running survey commands on multiple years takes a very long time. 
 
+In order to do a data update, you will need to:
 
-4.  Update the code to include more years and waves.  
-AAAAAAAAAAAAAAAA	
-	domain_cod_catch_totals   -- add new years and waves to the global at the beginning of the files
-	domain_haddock_catch_totals --  add new years and waves to the global
+1. run the copy_over_raw_mrip.do to copy and convert the sas7bdat files to dta. 
 
-BBBBBBBBBBBBB
-	domain_catch_frequencies_gom_cod_wave_YYYY_update  -- make a new file with 2014 and waves at the beginning of the files
-	domain_catch_frequencies_gom_haddock_wave_YYYY_update
-	
-	add this into the dsconcat "stacks"
-	
-CCCCCCCCCCCCCCCC
-	cod_length_freqs_by_wave_gom_YYYY  -- make a new file with 2014 and waves at the beginning of the files
-	haddock_length_freqs_by_wave_gom_YYYY
+2. Run get_ma_allocation to get Recreation sites for MA (NORTH SOUTH) and 
 
-	b2cod_length_freqs_by_wave_gom_YYYY  --  make a new file with 2014 and waves at the beginning of the files
-	b2haddock_length_freqs_by_wave_gom_YYYY
-	
-	add this into the dsconcat "stacks"
-
+3. Change the working year to the most recent year.
 
 	CHECK for missing waves in the "ab1_lengths", catch totals, catch frequencies.
+	
+
+	Because there are relatively few observations in FY2020, we decided to use the annual length-frequency distribution. 
+	However, we will want to do catch per trip at either the wave or month level.
  */
-/*Set up the catchlist, triplist, and b2list global macros. These hold the filenames that are needed to figure out the catch, length-frequency, trips, and other things.*/
 
-
+ 
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 capture mkdir "$my_outputdir"
 
+/*Set up the catchlist, triplist, and b2list global macros. These hold the filenames that are needed to figure out the catch, length-frequency, trips, and other things.*/
 
-
-
-set matsize 10000
 
 /********************************************************************************/
 /********************************************************************************/
@@ -68,6 +56,22 @@ global sizelist: dir "${data_raw}" files "size_$working_year*.dta"
 
 
 /* catch frequencies per trip*/
+
+/* need to drop 
+id_code=="1757420210428005" & common=="ATLANTIC COD" from the catchlist.
+id_code=="1757420210428005" & common=="ATLANTIC COD" from the sizelist.
+	
+no changes to triplist or b2list
+
+The syntax will be to set up a global and then do 
+cap drop $drop_conditional after loading in the catchlist or sizelist files
+
+		If we don't need to drop anything, the capture will swallow the error term.
+		And if we do, the code will drop the appropriate rows.
+*/
+
+global drop_conditional 
+global drop_conditional `"if id_code=="1757420210428005" & common=="ATLANTIC COD" "'
 
 
 
