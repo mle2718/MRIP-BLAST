@@ -45,7 +45,7 @@ clear
 foreach file in $catchlist{
 	append using ${data_raw}/`file'
 }
-
+cap drop $drop_conditional
 replace var_id=strat_id if strmatch(var_id,"")
 replace wp_catch=wp_int if wp_catch==.
 /*  Deal with new variable names in the transition period    */
@@ -78,14 +78,15 @@ sort year strat_id psu_id id_code
 replace common=subinstr(lower(common)," ","",.)
 save `cl1'
 use `tl1'
-merge 1:m year strat_id psu_id id_code using `cl1', keep(3)
+merge 1:m year wave strat_id psu_id id_code using `cl1', keep(3)
 drop _merge
 
 /* THIS IS THE END OF THE DATA MERGING CODE */
 
- /* ensure that domain is sub_reg=4 (New England), relevant states (MA, NH, ME), mode_fx =123, 457 */
- keep if sub_reg==4
- keep if st==23 | st==33 |st==25
+
+/* ensure that domain is sub_reg=4 (New England), relevant states (MA, NH, ME), mode_fx =123, 457 */
+* keep if inlist(sub_reg,4,5)
+* keep if st==23 | st==33 |st==25
 
 /*This is the "full" mrip data */
 tempfile tc1
@@ -104,6 +105,7 @@ drop _merge
 /*classify into GOM or GBS */
 gen str3 area_s="OTH"
 
+replace area_s="GBS" if  inlist(sub_reg,5 ,6 ,7) | inlist(st,9, 44)
 replace area_s="GOM" if st==23 | st==33
 replace area_s="GOM" if st==25 & strmatch(stock_region_calc,"NORTH")
 replace area_s="GBS" if st==25 & strmatch(stock_region_calc,"SOUTH")
