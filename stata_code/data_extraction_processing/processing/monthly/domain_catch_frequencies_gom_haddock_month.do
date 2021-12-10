@@ -30,9 +30,13 @@ COMPUTE totals and std deviations for cod catch
  clear
 
  mata: mata clear
-cd "/home/mlee/Documents/Workspace/MRIP_working/source files"
 tempfile tl1 sl1
-dsconcat $triplist
+
+
+foreach file in $triplist{
+	append using ${data_raw}/`file'
+}
+
 replace var_id=strat_id if strmatch(var_id,"")
 sort year strat_id psu_id id_code
 /*  Deal with new variable names in the transition period  
@@ -58,7 +62,12 @@ clear
 
  
 
-dsconcat $sizelist
+foreach file in $sizelist{
+	append using ${data_raw}/`file'
+}
+
+
+cap drop $drop_conditional
 /*  Deal with new variable names in the transition period    */
 
 	capture confirm variable wp_int_chts
@@ -101,7 +110,7 @@ rename intsite site_id
 sort site_id
 
 
-merge m:1 site_id using "ma_site_allocation.dta", keepusing(stock_region_calc)
+merge m:1 site_id using "${data_raw}/ma_site_allocation.dta", keepusing(stock_region_calc)
 rename  site_id intsite
 drop if _merge==2
 drop _merge
