@@ -1,0 +1,96 @@
+<<dd_version: 2>>
+
+Effort and Catch statistics 
+===============================================================
+Here are the topline effort and catch statistics by month
+
+~~~~
+<<dd_do:quietly>>
+do $MRIP_BLAST
+global vintage_string 2021_11_16
+global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
+global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
+local my_common1 "atlanticcod"
+local my_common2 "haddock"
+<</dd_do>>
+
+
+Here are number of trips in Calendar Year 2020. No trips in Jan -March that caught or targeted GOM cod or GOM haddock.
+<<dd_do>>
+global working_year 2020
+use "${my_outputdir}/`my_common1'_`my_common2'_target_${working_year}.dta", replace
+sort year month 
+list year month dtrip
+<</dd_do>>
+
+And here are the trips for 2021.  No trips in Jan -March that caught or targeted GOM cod or GOM haddock.
+<<dd_do>>
+global working_year 2021
+use "${my_outputdir}/`my_common1'_`my_common2'_target_${working_year}.dta", replace
+sort year month 
+list year month dtrip
+<</dd_do>>
+
+April 2020 is very different from April 2021, for COVID reasons.  However, July 2020 has a massive number of trips compared to July of 2021.  Apart from those two numbers, the effort data looks pretty similar. I think it's reasonable to calibrate the model to the 2021 data.  Months 9+10 will be available soon. And we can use month 11 from 2020.  We will also have to use April 2021 as a proxy for April 2022.
+
+
+Here are trips, by fishing year:
+
+
+
+
+<<dd_do>>
+use "${FY_dir}/FY_targeting.dta", replace
+/* 2018 has partial data in it (From April of 2019)*/
+drop if fishing_year<2019
+list
+<</dd_do>>
+There were alot of trips in 2020!  FY 2021 data is partial, but if it continues at the 2020 pace, we should expect 371,942 trips.
+
+
+
+
+
+
+Here are the haddock (a, b1, b2) in numbers for Calendar Year 2020
+<<dd_do>>
+global working_year 2020
+use "${my_outputdir}/`my_common2'_landings_${working_year}.dta", replace
+sort year month 
+format tot_catch a b1 b2 landings %10.0fc
+list 
+<</dd_do>>
+
+Here are the haddock (a, b1, b2) in numbers for Calendar Year 2021
+<<dd_do>>
+global working_year 2021
+use "${my_outputdir}/`my_common2'_landings_${working_year}.dta", replace
+sort year month 
+format tot_catch a b1 b2 landings %10.0fc
+list 
+<</dd_do>>
+
+
+
+
+
+Here are the cod (a, b1, b2) in numbers for Calendar Year 2020
+<<dd_do>>
+global working_year 2020
+use "${my_outputdir}/`my_common1'_landings_${working_year}.dta", replace
+sort year month 
+format tot_catch a b1 b2 landings %10.0fc
+list 
+<</dd_do>>
+
+Here are the cod (a, b1, b2) in numbers for Calendar Year 2021
+<<dd_do>>
+global working_year 2021
+use "${my_outputdir}/`my_common1'_landings_${working_year}.dta", replace
+sort year month 
+format tot_catch a b1 b2 landings %10.0fc
+list 
+<</dd_do>>
+
+
+
