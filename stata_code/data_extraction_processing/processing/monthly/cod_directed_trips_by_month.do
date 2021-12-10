@@ -75,6 +75,8 @@ clear
 foreach file in $catchlist{
 	append using ${data_raw}/`file'
 }
+
+cap drop $drop_conditional
 replace var_id=strat_id if strmatch(var_id,"")
 replace wp_catch=wp_int if wp_catch==.
 /*  Deal with new variable names in the transition period    */

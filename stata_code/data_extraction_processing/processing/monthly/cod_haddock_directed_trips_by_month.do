@@ -76,7 +76,7 @@ clear
 foreach file in $catchlist{
 	append using ${data_raw}/`file'
 }
-
+cap drop $drop_conditional
 replace var_id=strat_id if strmatch(var_id,"")
 replace wp_catch=wp_int if wp_catch==.
 /*  Deal with new variable names in the transition period    */
@@ -226,6 +226,9 @@ foreach j of numlist 1/`i'{
 keep if strmatch(area_s,"GOM")==1
 keep if strmatch(dom_id,"1")==1
 format dtrip %10.0fc
+decode my_dom_id, gen(my_dom_id_string)
+drop my_dom_id
+rename my_dom_id_string my_dom_id
 save "${my_outputdir}/`my_common1'_`my_common2'_target_${working_year}.dta", replace
 
 restore

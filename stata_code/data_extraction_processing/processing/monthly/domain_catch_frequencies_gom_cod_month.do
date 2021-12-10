@@ -62,7 +62,7 @@ foreach file in $catchlist{
 	append using ${data_raw}/`file'
 }
 
-
+cap drop $drop_conditional
 replace var_id=strat_id if strmatch(var_id,"")
 replace wp_catch=wp_int if wp_catch==.
 /*  Deal with new variable names in the transition period    */
@@ -114,7 +114,6 @@ save `tc1'
 /*classify as GOM or GB based on the ma_site_allocation.dta file */
 rename intsite site_id
 sort site_id
-
 
 
 merge m:1 site_id using "${data_raw}/ma_site_allocation.dta", keepusing(stock_region_calc) 

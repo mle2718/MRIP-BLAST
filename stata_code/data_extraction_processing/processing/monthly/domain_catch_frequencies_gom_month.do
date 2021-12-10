@@ -61,7 +61,7 @@ clear
 foreach file in $catchlist{
 	append using ${data_raw}/`file'
 }
-
+cap drop $drop_conditional
 replace var_id=strat_id if strmatch(var_id,"")
 replace wp_catch=wp_int if wp_catch==.
 /*  Deal with new variable names in the transition period    */
@@ -115,8 +115,7 @@ rename intsite site_id
 sort site_id
 
 
-
-merge m:1 site_id using "${data_raw}/ma_site_allocation.dta", keepusing(stock_region_calc) 
+merge m:1 site_id using "${data_raw}/ma_site_allocation.dta", keepusing(stock_region_calc)
 rename  site_id intsite
 drop if _merge==2
 drop _merge

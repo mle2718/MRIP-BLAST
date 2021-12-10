@@ -67,6 +67,7 @@ clear
 foreach file in $b2list{
 	append using ${data_raw}/`file'
 }
+cap drop $drop_conditional
 /*  Deal with new variable names in the transition period    */
 
 	capture confirm variable wp_int_chts
