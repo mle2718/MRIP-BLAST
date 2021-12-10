@@ -28,8 +28,6 @@ local sourcedir "/run/user/1000/gvfs/smb-share:server=net,share=mrfss/$mrip_esti
 local sourcedir "M:/$mrip_estim_pub_2018"
 
 
-global yearlist 2021(1)2021
-global wavelist 1(1)6
 cd "${data_raw}"
 
 /*copy over sas7bdats. Convert them to stata dta */ 
