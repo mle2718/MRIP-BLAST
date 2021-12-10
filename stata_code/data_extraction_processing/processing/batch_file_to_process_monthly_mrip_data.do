@@ -30,14 +30,13 @@ capture mkdir "$my_outputdir"
 
 /********************************************************************************/
 /********************************************************************************/
-/* Use these to control the years and species for which the MRIP data is polled/queried*/
+/* loop over calendar years */
 /********************************************************************************/
 /********************************************************************************/
-global working_year  2019
-global working_year  2020
-global working_year  2021
+foreach yr of numlist 2019 2020 2021{
+	global working_year `yr'
 
-local year $working_year
+
 global wavelist 1 2 3 4 5 6
 global species1 "atlanticcod"
 global species2 "haddock"
@@ -242,13 +241,11 @@ do "${processing_code}/monthly/cod_monthly_weight_ab1b2.do"
 
 
 
-
-
-
-
 /* caught/targeted haddock or caught cod by wave */
 do "${processing_code}/monthly/haddock_monthly_weight_ab1b2.do"
 
 
+
+}
 
 
