@@ -70,7 +70,7 @@ cap drop $drop_conditional after loading in the catchlist or sizelist files
 */
 
 global drop_conditional 
-global drop_conditional `"if id_code=="1757420210428005" & common=="ATLANTIC COD" "'
+global drop_conditional `"if id_code=="1792820210410001" "'
 
 
 
