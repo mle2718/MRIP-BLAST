@@ -38,6 +38,7 @@ tempfile tl1 sl1
 foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
+cap drop $drop_conditional
 
 replace var_id=strat_id if strmatch(var_id,"")
 sort year strat_id psu_id id_code

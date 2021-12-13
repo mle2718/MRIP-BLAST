@@ -46,6 +46,7 @@ foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
 /* *dtrip will be used to estimate total directed trips, do not change it*/
+cap drop $drop_conditional
 
 gen dtrip=1
 

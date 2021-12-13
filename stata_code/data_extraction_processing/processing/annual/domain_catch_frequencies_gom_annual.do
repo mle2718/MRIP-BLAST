@@ -36,6 +36,8 @@ clear
 foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
+capture drop $drop_conditional
+
 sort year strat_id psu_id id_code
 /*  Deal with new variable names in the transition period  
 

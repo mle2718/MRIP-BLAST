@@ -36,6 +36,7 @@ tempfile tl1 sl1
 foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
+cap drop $drop_conditional
 
 
 

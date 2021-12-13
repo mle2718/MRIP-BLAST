@@ -27,6 +27,7 @@ w    = wave
 
 
 */
+
 version 12.1
 pause on
 /* General strategy 
@@ -48,6 +49,7 @@ foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
 /* *dtrip will be used to estimate total directed trips, do not change it*/
+capture drop $drop_conditional
 
 gen dtrip=1
 
