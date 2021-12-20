@@ -1,4 +1,11 @@
-/* This is just a little helper file that calls all the yearly files and stacks the wave-level data into single datasets 
+/* 
+This probably isn't doing everything we need it to do
+
+Need to read in the 2b95 landings.  Doesn't loop over years*/
+
+
+
+This is just a little helper file that calls all the yearly files and stacks the wave-level data into single datasets 
 It also aggregates everything into the proper format for the recreational bioeconomic model 
 It's quite awesome.
 
@@ -54,8 +61,10 @@ global sizelist: dir "${data_raw}" files "size_$working_year*.dta"
 /* catch frequencies per trip*/
 
 /* need to drop 
-id_code=="1757420210428005" & common=="ATLANTIC COD" from the catchlist.
-id_code=="1757420210428005" & common=="ATLANTIC COD" from the sizelist.
+id_code=="1757420210428005" from the sizelist, triplist, and catchlist. This is a trip that took place inshore in 2020 that caught 2 fish that were probably not cod
+
+
+id_code="1792820210410001" should be dropped from the triplist catchlist when computing targeted trips. 
 	
 no changes to triplist or b2list
 
@@ -67,14 +76,20 @@ cap drop $drop_conditional after loading in the catchlist or sizelist files
 */
 
 global drop_conditional 
-global drop_conditional `"if id_code=="1792820210410001" "'
-
-
 
 
 
 foreach sp in atlanticcod haddock{
 	global my_common `sp'
+		
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if id_code=="1757420210428005"  "'
+	}
+	else {
+    global drop_conditional 
+	}
+
+
 	do "${processing_code}/annual/domain_catch_frequencies_gom_annual.do"
 	clear
 }
@@ -85,6 +100,16 @@ foreach sp in atlanticcod haddock{
 /* catch totals  -- these are done for all 3 years at once*/
 
 global my_common "atlanticcod"
+
+	
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if id_code=="1757420210428005"  "'
+	}
+	else {
+    global drop_conditional 
+	}
+
+
 do "${processing_code}/annual/domain_cod_annual_catch_totals.do"
 
 
@@ -97,6 +122,14 @@ rename tot_cat tot_catch
 gen landings=a+b1
 save "$my_outputdir/atlanticcod_landings_annual_$working_year.dta", replace
 global my_common "haddock"
+	
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if id_code=="1757420210428005"  "'
+	}
+	else {
+    global drop_conditional 
+	}
+
 
 do "${processing_code}/annual/domain_haddock_annual_catch_totals.do"
 
@@ -129,6 +162,16 @@ clear
 
 foreach sp in atlanticcod haddock{
 	global my_common `sp'
+	
+		
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if id_code=="1757420210428005"  "'
+	}
+	else {
+    global drop_conditional 
+	}
+
+
 	do "${processing_code}/annual/length_freqs_by_year_gom.do"
 	clear
 }
@@ -164,6 +207,16 @@ save "$my_outputdir/haddock_ab1_annual_$working_year.dta", replace
 /* B2 length frequencies per wave*/
 foreach sp in atlanticcod haddock{
 	global my_common `sp'
+	
+		
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if id_code=="1757420210428005"  "'
+	}
+	else {
+    global drop_conditional 
+	}
+
+
 	do "${processing_code}/annual/b2_length_freqs_by_year_gom.do"
 }
 
@@ -215,3 +268,4 @@ do "${processing_code}/annual/cod_haddock_directed_trips_annual.do"
 
 
 
+global drop_conditional `"if id_code=="1792820210410001"  "'
