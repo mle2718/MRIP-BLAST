@@ -46,6 +46,7 @@ tempfile tl1 cl1
 foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
+capture drop $drop_conditional
 
 /* *dtrip will be used to estimate total directed trips, do not change it*/
 
@@ -76,6 +77,8 @@ clear
 foreach file in $catchlist{
 	append using ${data_raw}/`file'
 }
+capture drop $drop_conditional
+
 replace var_id=strat_id if strmatch(var_id,"")
 replace wp_catch=wp_int if wp_catch==.
 /*  Deal with new variable names in the transition period    */
