@@ -22,10 +22,42 @@ In order to do a data update, you will need to:
  */
 
  
-global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
+global workdir "${data_main}/MRIP_$vintage_string"
+capture mkdir "$workdir"
+global my_outputdir "${workdir}/monthly"
 capture mkdir "$my_outputdir"
 
+
+
+
+
+
+/* readin the 2b95 landings  */
+clear
+input year 	month 	trimmed_landings
+2020 	5   63
+2020 	6 	2267
+2020 	7 	1465
+2020 	8 	3912
+2020 	9 	7829
+2020 	10 	955
+2020 	11 	0
+2021 	4 	1434
+2021 	5 	10
+2021 	6 	517
+2021 	7 	61
+2021 	8 	258
+end
+save "${my_outputdir}/atlanticcod_landings_2b95.dta", replace
+
+
+
+/*  */
+
+
 /*Set up the catchlist, triplist, and b2list global macros. These hold the filenames that are needed to figure out the catch, length-frequency, trips, and other things.*/
+
+
 
 
 /********************************************************************************/
@@ -57,9 +89,11 @@ global sizelist: dir "${data_raw}" files "size_$working_year*.dta"
 /* catch frequencies per trip*/
 
 /* need to drop 
-id_code=="1757420210428005" & common=="ATLANTIC COD" from the catchlist.
-id_code=="1757420210428005" & common=="ATLANTIC COD" from the sizelist.
-	
+id_code=="1757420210428005" from the sizelist, triplist, and catchlist. This is a trip that took place inshore in 2020 that caught 2 fish that were probably not cod
+
+
+id_code="1792820210410001" should be dropped from the triplist catchlist when computing targeted trips. 
+
 no changes to triplist or b2list
 
 The syntax will be to set up a global and then do 
@@ -70,19 +104,43 @@ cap drop $drop_conditional after loading in the catchlist or sizelist files
 */
 
 global drop_conditional 
-global drop_conditional `"if id_code=="1792820210410001" "'
 
 
 
 foreach sp in atlanticcod haddock{
 	global my_common `sp'
+	
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if id_code=="1757420210428005"  "'
+	}
+	else {
+    global drop_conditional 
+	}
+
 	do "${processing_code}/monthly/domain_catch_frequencies_gom_month.do"
 }
 
 /* catch totals  -- these are done for all 3 years at once*/
 
 global my_common "atlanticcod"
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if  id_code=="1757420210428005"  "'
+	}
+	else {
+		global drop_conditional 
+	}
+
 do "${processing_code}/monthly/domain_cod_monthly_catch_totals.do"
+
+
+
+
+/* this is the place to "hack" using the trimmed landings from scott 
+
+read it in and merge.  rename landings old_landings. and rename trim_landings just landings
+*/
+
+
 
 
 use "$my_outputdir/atlanticcod_catch_$working_year.dta", clear
@@ -93,16 +151,47 @@ rename release b2
 rename tot_cat tot_catch
 gen landings=a+b1
 capture destring month, replace
+
+/*substitute the 2b95 landings for cod in FY 2020 only 
+This is May 2020 to April of 2021 only 
+*/
+if inlist($working_year,2020){
+	merge 1:1 year month using  "${my_outputdir}/atlanticcod_landings_2b95.dta", keep(1 3)
+replace trimmed_landings=0 if trimmed_landings==. & _merge==1
+drop _merge
+rename landings landings_old
+rename trimmed_landings landings
+rename tot_cat tot_cat_old
+gen tot_cat=landings+b2
+}
+
+/* substitute only for months 1 to 4 */
+if inlist($working_year,2021){
+	merge 1:1 year month using  "${my_outputdir}/atlanticcod_landings_2b95.dta", keep(1 3)
+drop _merge
+clonevar landings_old= landings
+replace landings= trimmed_landings if inlist(month,"01","02","03","04")
+rename tot_cat tot_cat_old
+gen tot_cat=landings+b2
+}
+
+
 save "$my_outputdir/atlanticcod_landings_$working_year.dta", replace
 
 
 
 global my_common "haddock"
 
+	if "$my_common"=="atlanticcod"{
+   global drop_conditional `"if  id_code=="1757420210428005"  "'
+}
+else {
+    global drop_conditional 
+	}
+
+	
+	
 do "${processing_code}/monthly/domain_haddock_monthly_catch_totals.do"
-
-
-
 
 
 use "$my_outputdir/haddock_catch_$working_year.dta", clear
@@ -132,6 +221,14 @@ clear
 
 foreach sp in atlanticcod haddock{
 	global my_common `sp'
+	
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if  id_code=="1757420210428005"  "'
+}
+	else {
+    global drop_conditional 
+	}
+
 	do "${processing_code}/monthly/length_freqs_by_month_gom.do"
 }
 
@@ -169,6 +266,13 @@ save "$my_outputdir/haddock_ab1_$working_year.dta", replace
 /* B2 length frequencies per wave*/
 foreach sp in atlanticcod haddock{
 	global my_common `sp'
+	if "$my_common"=="atlanticcod"{
+	   global drop_conditional `"if  id_code=="1757420210428005"  "'
+}
+	else {
+    global drop_conditional 
+	}
+
 	do "${processing_code}/monthly/b2_length_freqs_by_month_gom.do"
 }
 
@@ -211,6 +315,7 @@ do "${processing_code}/monthly/process_b2_haddock.do"
 
 
 
+global drop_conditional `"if (id_code=="1792820210410001" | id_code=="1757420210428005")  "'
 
 
 /* caught/targeted haddock or caught cod by wave */
