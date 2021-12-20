@@ -10,9 +10,9 @@ Then you have to add these up.
 /* process the b2 haddock */
 
 
-use  "$my_outputdir/haddock_catch_$working_year.dta", clear
+use  "$my_outputdir/haddock_landings_$working_year.dta", clear
 destring month, replace
-gen ab1=claim+harvest
+gen ab1=landings
 keep year month ab1
 tempfile claim_harvest
 sort year month
@@ -22,8 +22,9 @@ save `claim_harvest'
 
 
 
-use  "$my_outputdir/haddock_catch_$working_year.dta", clear
+use  "$my_outputdir/haddock_landings_$working_year.dta", clear
 destring month, replace
+rename b2 release
 
 keep year month release
 tempfile cm
@@ -83,6 +84,7 @@ keep year month l_in_bin ab1_count
 
 sort year month l_in_bin
 
+save "$my_outputdir/haddock_ab1_counts_$working_year.dta", replace
 
 
 

@@ -8,17 +8,18 @@ Then you have to add these up.
 
 /* process the b2 cod */
 
-use  "$my_outputdir/atlanticcod_catch_$working_year.dta", clear
+use  "$my_outputdir/atlanticcod_landings_$working_year.dta", clear
 destring month, replace
-gen ab1=claim+harvest
+gen ab1=landings
 keep year month ab1
 tempfile claim_harvest
 sort year month
 save `claim_harvest'
 
 
-use "$my_outputdir/atlanticcod_catch_$working_year.dta", clear
+use "$my_outputdir/atlanticcod_landings_$working_year.dta", clear
 destring month, replace
+rename b2 release
 keep year month release
 tempfile cm
 sort year month
@@ -84,6 +85,9 @@ gen ab1_count=prob*ab1
 keep year month l_in_bin ab1_count
 
 sort year month l_in_bin
+
+save "$my_outputdir/atlanticcod_ab1_counts_$working_year.dta", replace
+
 
 merge 1:1 year month l_in_bin using  "$my_outputdir/atlanticcod_b2_counts_$working_year.dta"
 replace ab1_count=0 if ab1_count==.
