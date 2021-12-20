@@ -1,8 +1,7 @@
 
-use "${data_main}/MRIP_${vintage_string}/monthly/haddock_ab1_${working_year}.dta", clear
+use "${data_main}/MRIP_${vintage_string}/monthly/haddock_ab1_counts_${working_year}.dta", clear
 
 
-rename count ab1_count
 
 merge 1:1 year month l_in_bin using "${data_main}/MRIP_${vintage_string}/monthly/haddock_b2_counts_${working_year}.dta"
 replace ab1_count=0 if ab1_count==.
