@@ -7,19 +7,18 @@ Then you have to add these up.
 
 
 /* process the b2 cod */
-use  "$my_outputdir/atlanticcod_catch_annual_$working_year.dta", clear
-rename claim a
-rename harvest b1
-rename release b2
-rename tot_cat tot_catch
-gen ab1=a+b1
+use  "$my_outputdir/atlanticcod_landings_annual_$working_year.dta", clear
+destring month, replace
+gen ab1=landings
+keep year month ab1
 keep year ab1
 tempfile claim_harvest
 sort year 
 save `claim_harvest'
 
-use "$my_outputdir/atlanticcod_catch_annual_$working_year.dta", clear
-
+use "$my_outputdir/atlanticcod_landings_annual_$working_year.dta", clear
+destring month, replace
+rename b2 release
 keep year release
 tempfile cm
 sort year 
