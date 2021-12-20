@@ -1,4 +1,8 @@
-/* This do file is the final data prep for the BLAST model */
+/* This do file is the final data prep for the BLAST model 
+
+Convert the monthly data to fishing-year data. We always substitute "non-available" from the previous year when necessary. This usually means Nov, Dec, Jan, Feb, Mar, April 
+
+*/
 
 pause off
 
@@ -22,8 +26,10 @@ local lastyr=`yr1'-1
 /*Load in the stacked monthly catch class distributions*/
 use ${stacked_dir}/monthly_cod_catch_class.dta, replace
 
-keep if fishing_year==`yr1'
 
+
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+replace fishing_year=`yr1'
 /* annual totals */
 collapse (sum) count, by(tot_cat fishing_year)
 /* expand so there is one set of obs per month */
@@ -57,8 +63,10 @@ graph export "${my_images}/cod_catch_class_ANNUAL_`yr1'.tif", as(tif) replace
 /*Load in the stacked monthly catch class distributions*/
 use ${stacked_dir}/monthly_haddock_catch_class.dta, replace
 
-keep if fishing_year==`yr1'
 
+
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+replace fishing_year=`yr1'
 /* annual totals */
 collapse (sum) count, by(tot_cat fishing_year)
 /* expand so there is one set of obs per month */
@@ -114,7 +122,10 @@ graph export "${my_images}/haddock_catch_class_ANNUAL_`yr1'.tif", as(tif) replac
 
 /*read in the size class distributions. Keep just the relevant FY. Collapse*/
 use ${stacked_dir}/monthly_cod_size_class.dta, replace
-keep if fishing_year==`yr1'
+
+
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+replace fishing_year=`yr1'
 collapse (sum) count, by(lngcat fishing_year)
 
 /* expand so there is one set of obs per month */
@@ -146,7 +157,11 @@ graph export  "${my_images}/cod_size_class_ANNUAL`yr1'.tif", as(tif) replace
 
 /*read in the size class distributions. Keep just the relevant FY. Collapse*/
 use ${stacked_dir}/monthly_haddock_size_class.dta, replace
-keep if fishing_year==`yr1'
+
+
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+replace fishing_year=`yr1'
+
 collapse (sum) count, by(lngcat fishing_year)
 
 /* expand so there is one set of obs per month */
@@ -166,9 +181,6 @@ label var count "count 1000s"
 xtline count
 graph export  "${my_images}/haddock_size_class_ANNUAL`yr1'.tif", as(tif) replace
 
-label var count "count 1000s"
-xtline count
-graph export  "${my_images}/haddock_size_class`yr1'.tif", as(tif) replace
 
 
 
