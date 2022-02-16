@@ -5,6 +5,10 @@ pause off
 global stacked_dir "${data_main}/MRIP_$vintage_string/stacked_monthly"
 global BLAST_DIR "${BLAST_root}/cod_haddock_fy2022/source_data/mrip"
 
+global hmin 17
+global cmin 21
+
+
 
 /* which fishing year do you want */
 local yr1 2021 
@@ -93,6 +97,12 @@ replace count=count/1000
 label var count "count 1000s"
 xtline count
 graph export "${my_images}/cod_catch_class_`yr1'.tif", as(tif) replace
+
+bysort month: egen tc=total(count)
+gen prob=count/tc
+xtline prob
+graph export "${my_images}/cod_catch_classP_`yr1'.tif", as(tif) replace
+
 
 /*******************END COD **************************************/
 
@@ -184,6 +194,13 @@ replace count=count/1000
 label var count "count 1000s"
 xtline count
 graph export "${my_images}/haddock_catch_class_`yr1'.tif", as(tif) replace
+
+
+
+bysort month: egen tc=total(count)
+gen prob=count/tc
+xtline prob
+graph export "${my_images}/haddock_catch_classP_`yr1'.tif", as(tif) replace
 
 
 /*******************END HADDOCK **************************************/
@@ -309,10 +326,14 @@ save "${BLAST_DIR}/cod_size_class`yr1'.dta", replace
 
 replace count=count/1000
 label var count "count 1000s"
-xtline count
+xtline count, xline($cmin)
 graph export  "${my_images}/cod_size_class`yr1'.tif", as(tif) replace
 
 
+bysort month: egen tc=total(count)
+gen prob=count/tc
+xtline prob, xline($cmin)
+graph export "${my_images}/cod_size_classP_`yr1'.tif", as(tif) replace
 
 
 /*******************END COD **************************************/
@@ -412,8 +433,13 @@ save "${BLAST_DIR}/haddock_size_class`yr1'.dta", replace
 
 replace count=count/1000
 label var count "count 1000s"
-xtline count
+xtline count, xline($hmin)
+
 graph export  "${my_images}/haddock_size_class`yr1'.tif", as(tif) replace
 
 
+bysort month: egen tc=total(count)
+gen prob=count/tc
+xtline prob, xline($hmin)
+graph export "${my_images}/haddock_size_classP_`yr1'.tif", as(tif) replace
 
