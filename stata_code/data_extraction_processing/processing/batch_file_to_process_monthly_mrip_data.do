@@ -65,7 +65,7 @@ save "${my_outputdir}/atlanticcod_landings_2b95.dta", replace
 /* loop over calendar years */
 /********************************************************************************/
 /********************************************************************************/
-foreach yr of numlist 2019 2020 2021{
+foreach yr of numlist 2020{
 	global working_year `yr'
 
 
@@ -170,7 +170,7 @@ if inlist($working_year,2021){
 	merge 1:1 year month using  "${my_outputdir}/atlanticcod_landings_2b95.dta", keep(1 3)
 drop _merge
 clonevar landings_old= landings
-replace landings= trimmed_landings if inlist(month,"01","02","03","04")
+replace landings= trimmed_landings if inlist(month,1,2,3,4)
 rename tot_cat tot_cat_old
 gen tot_cat=landings+b2
 }
