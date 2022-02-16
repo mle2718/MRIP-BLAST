@@ -3,14 +3,13 @@
 Effort  statistics 
 ===============================================================
 
-Wave 5 of 2021 will come out "soon." (by end of week).
-
+This includes Wave 5 of 2021. I use Jan-April of 2021 data as a proxy for Jan-April, 2022.
 
 BLAST inputs:
 
-1.  Annual Length-frequency for cod and haddock, using just FY2021 data . I *will* use Jan-April of 2021 data as a proxy for Jan-April, 2022.
-2.  Monthly Catch-per-trip for cod and haddock.  We will use FY 2021 data. I *will* use Jan-April, 2021 as a proxy for the Jan-April, 2022 data.
-3.  Total trips.  We use FY 2021 data. We will use Jan-April, 2021 as a proxy for the Jan-April, 2022 data.
+1.  Annual Length-frequency for cod and haddock. 
+2.  Monthly Catch-per-trip for cod and haddock. 
+3.  Total trips.  We use FY 2021 data.
 
 Data cleaning
 	
@@ -20,7 +19,6 @@ Data cleaning
 
 ~~~~
 <<dd_do:quietly>>
-
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.
 do $MRIP_BLAST
 global vintage_string 2021_11_16
@@ -35,10 +33,13 @@ local my_common2 "haddock"
 Here are number of trips in Calendar Year 2020. No trips in Jan -March that caught or targeted GOM cod or GOM haddock.
 
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2020
 use "${my_outputdir}/`my_common1'_`my_common2'_target_${working_year}.dta", replace
 sort year month 
+<</dd_do>>
+
+<<dd_do>>
 list year month dtrip, abbreviate(16)
 <</dd_do>>
 ~~~~
@@ -46,26 +47,33 @@ list year month dtrip, abbreviate(16)
 
 And here are the trips for 2021.  No trips in Jan -March that caught or targeted GOM cod or GOM haddock.
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2021
 use "${my_outputdir}/`my_common1'_`my_common2'_target_${working_year}.dta", replace
 sort year month 
-list year month dtrip, abbreviate(16)
+<</dd_do>>
 
+<<dd_do>>
+list year month dtrip, abbreviate(16)
 <</dd_do>>
 ~~~~
-April 2020 is very different from April 2021, for COVID reasons.  However, July 2020 has a massive number of trips compared to July of 2021.  Apart from those two numbers, the effort data looks pretty similar. I think it's reasonable to calibrate the model to the 2021 data.  Months 9+10 will be available soon. And we can use month 11 from 2020.  We will also have to use April 2021 as a proxy for April 2022.
 
+1. April 2020 is very different from April 2021, for COVID reasons. 
+1. July 2020 has a massive number of trips compared to July of 2021. 
+1. The Sept and October numbers are pretty different from 2020 to 2021. But taken together they are similar (52,500 trips in 2020 and 47,000 trips in 2021)
+
+We will have to use Nov 2020 and April 2021 as proxies for Nov 2021 and April 2022.
 
 Here are trips, by fishing year:
 
-
-
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 use "${FY_dir}/FY_targeting.dta", replace
 /* 2018 has partial data in it (From April of 2019)*/
 drop if fishing_year<2019
+<</dd_do>>
+
+<<dd_do>>
 list, abbreviate(16)
 <</dd_do>>
 ~~~~
@@ -78,23 +86,28 @@ Catch Statistics for Cod
 
 Here are the cod (a, b1, b2) in numbers for Calendar Year 2020.  Landings are the 2b95 method and landings_old are straight out of MRIP:
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2020
 use "${my_outputdir}/`my_common1'_landings_${working_year}.dta", replace
 sort year month 
 format tot_cat a b1 b2 landings* %10.0fc
+<</dd_do>>
+
+<<dd_do>>
 list , abbreviate(16)
 <</dd_do>>
 ~~~~
 
-Here are the cod (a, b1, b2) in numbers for Calendar Year 2021.Landings are the 2b95 method and landings_old are straight out of MRIP:
+Here are the cod (a, b1, b2) in numbers for Calendar Year 2021.  For Jan-April, landings are the 2b95 method and landings_old are straight out of MRIP.  In the following table, only April 2021 has a different value for landings_old and landings.  For May-October, landings are straight out of MRIP.
 ~~~~
-<<dd_do>>.
+<<dd_do:quietly>>
 global working_year 2021
 use "${my_outputdir}/`my_common1'_landings_${working_year}.dta", replace
 sort year month 
+format tot_cat a b1 b2 landings landings_old %10.0fc
+<</dd_do>>
 
-format tot_cat a b1 b2 landings  %10.0fc
+<<dd_do>>
 list , abbreviate(16)
 <</dd_do>>
 ~~~~
@@ -103,7 +116,7 @@ list , abbreviate(16)
 
 Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year 2020. This uses the 2b95 method.  
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2020
 use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${working_year}.dta", clear
 replace ab1weight=ab1weight/2204
@@ -113,16 +126,19 @@ rename b2weight b2mt
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
+<</dd_do>>
 
+
+<<dd_do>>
 list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
 <</dd_do>>
 ~~~~
 
 
 
-Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year 2021. This uses the 2b95 method.  
+Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year 2021. For Jan-April, landings are the 2b95 method. For May-October, landings are straight out of MRIP. 
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2021
 use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${working_year}.dta", clear
 replace ab1weight=ab1weight/2204
@@ -132,6 +148,8 @@ rename b2weight b2mt
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
+<</dd_do>>
+<<dd_do>>
 
 list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
 <</dd_do>>
@@ -146,22 +164,26 @@ Catch Statistics for Haddock
 
 Here are the haddock (a, b1, b2) in numbers for Calendar Year 2020
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2020
 use "${my_outputdir}/`my_common2'_landings_${working_year}.dta", replace
 sort year month 
 format tot_catch a b1 b2 landings %10.0fc
+<</dd_do>>
+<<dd_do>>
 list , abbreviate(16)
 <</dd_do>>
 ~~~~
 
 Here are the haddock (a, b1, b2) in numbers for Calendar Year 2021
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2021
 use "${my_outputdir}/`my_common2'_landings_${working_year}.dta", replace
 sort year month 
 format tot_catch a b1 b2 landings* %10.0fc
+<</dd_do>>
+<<dd_do>>
 list , abbreviate(16)
 <</dd_do>>
 ~~~~
@@ -171,7 +193,7 @@ list , abbreviate(16)
 
 Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year 2020.  
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2020
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${working_year}.dta", clear
 replace ab1weight=ab1weight/2204
@@ -181,7 +203,9 @@ rename b2weight b2mt
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
+<</dd_do>>
 
+<<dd_do>>
 list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
 <</dd_do>>
 ~~~~
@@ -190,7 +214,7 @@ list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
 
 Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year 2021.
 ~~~~
-<<dd_do>>
+<<dd_do:quietly>>
 global working_year 2021
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${working_year}.dta", clear
 replace ab1weight=ab1weight/2204
@@ -200,7 +224,8 @@ rename b2weight b2mt
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
-
+<</dd_do>>
+<<dd_do>>
 list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
 <</dd_do>>
 ~~~~
