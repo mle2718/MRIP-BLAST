@@ -1,7 +1,10 @@
 /* 
 This probably isn't doing everything we need it to do
 
-Need to read in the 2b95 landings.  Doesn't loop over years*/
+Need to read in the 2b95 landings.  Doesn't loop over years
+
+we probably won' use this anymore
+
 
 
 

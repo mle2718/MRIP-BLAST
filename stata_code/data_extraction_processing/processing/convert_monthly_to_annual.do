@@ -7,14 +7,16 @@ Convert the monthly data to fishing-year data. We always substitute "non-availab
 pause off
 
 global stacked_dir "${data_main}/MRIP_$vintage_string/stacked_monthly"
-global BLAST_DIR "${BLAST_root}/cod_haddock_fy2022/source_data/mrip"
+global BLAST_DIR "${BLAST_root}/cod_haddock_fy2023/source_data/mrip"
 
 global hmin 17
 global cmin 21
 
 
 /* which fishing year do you want */
-local yr1 2021 
+*local yr1 2021 
+local yr1 2022 
+
 local lastyr=`yr1'-1
 
 /***********************************************************************************************/

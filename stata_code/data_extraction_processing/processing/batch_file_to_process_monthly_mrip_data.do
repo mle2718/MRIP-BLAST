@@ -65,7 +65,7 @@ save "${my_outputdir}/atlanticcod_landings_2b95.dta", replace
 /* loop over calendar years */
 /********************************************************************************/
 /********************************************************************************/
-foreach yr of numlist 2020{
+foreach yr of numlist 2021 2022{
 	global working_year `yr'
 
 
