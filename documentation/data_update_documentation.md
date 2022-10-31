@@ -19,3 +19,5 @@ Ensure that your stat-transfer executable can be found. It is set with in profil
 1. ``batch_file_to_process_annual_mrip_data.do`` - not using an annual timestep.
 2. ``copy_over_raw_mrip.do``  -- this just copies file.  
 
+# Files that need to be run
+1. ``extraction_wrapper.do'' and ``process_wrapper.do`` are the only files that need to be run
