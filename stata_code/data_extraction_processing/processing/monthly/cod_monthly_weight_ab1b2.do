@@ -36,7 +36,7 @@ gen weight_per_fish= $kilotolb*$coda*((l_in_bin+.5)/$cmtoinch)^$codb
 gen ab1weight=round(ab1_count)*weight_per_fish
 gen b2weight=round(b2_count)*weight_per_fish
 
-keep if year>=2013
+keep if year==$working_year
 
 drop if l_in_bin==0
 collapse (sum) ab1weight b2weight ab1_count b2_count, by(year month)
