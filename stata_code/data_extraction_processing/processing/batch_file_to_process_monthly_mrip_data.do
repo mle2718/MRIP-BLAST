@@ -65,7 +65,7 @@ save "${my_outputdir}/atlanticcod_landings_2b95.dta", replace
 /* loop over calendar years */
 /********************************************************************************/
 /********************************************************************************/
-foreach yr of numlist 2020{
+foreach yr of numlist 2021 2022{
 	global working_year `yr'
 
 
@@ -290,7 +290,7 @@ foreach file of local cod_wave_b2{
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
-
+keep if year==$working_year
 
 capture destring month, replace
 save "$my_outputdir/cod_b2_$working_year.dta", replace
@@ -302,6 +302,7 @@ foreach file of local haddock_wave_b2{
 }
 
 capture destring month, replace
+keep if year==$working_year
 
 save "$my_outputdir/haddock_b2_$working_year.dta", replace
 

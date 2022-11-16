@@ -15,6 +15,8 @@ capture mkdir "$annual"
 global stacked_month "${workdir}/stacked_monthly"
 capture mkdir "$stacked_month"
 
+global this_working_year 2022
+
 /*this computes calendar year estimates, which you don't really use
 do "$processing_code/batch_file_to_process_annual_mrip_data.do"
  */
@@ -49,4 +51,4 @@ do "$processing_code/convert_monthly_to_annual.do"
 
 
 /* Write to a html file.*/
-dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries.html) replace
+dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace

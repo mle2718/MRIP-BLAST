@@ -30,6 +30,7 @@ keep year month release
 tempfile cm
 sort year month
 save `cm'
+keep if year==$working_year
 
 use "$my_outputdir/haddock_b2_$working_year.dta", clear
 
@@ -59,7 +60,10 @@ gen b2_count=prob*release
 keep year month l_in_bin b2_count
 
 sort year month l_in_bin
+keep if year==$working_year
+
 /* save */
+
 save  "$my_outputdir/haddock_b2_counts_$working_year.dta", replace
 
 
@@ -110,6 +114,7 @@ use `tth1', clear
 keep year month l_in_bin ab1_count countnumbers
 gen fy=year
 replace fy=fy-1 if month<=4
+keep if year==$working_year
 
 export excel year month fy l_in_bin ab1_count count using "$my_outputdir/haddock_sublegal_retention_$working_year.xls", firstrow(variables) replace
 save  "$my_outputdir/haddock_sublegals_$working_year.dta", replace

@@ -5,7 +5,7 @@ do ${extraction_code}/get_ma_allocation.do
 
 
 /* copying over full years of data */
-global yearlist 2019(1)2020
+global yearlist 2019(1)2021
 global wavelist 1(1)6
 
 do ${extraction_code}/copy_over_raw_mrip.do
@@ -13,7 +13,8 @@ do ${extraction_code}/copy_over_raw_mrip.do
 
 
 /* copying over partial years of data */
-global yearlist 2021(1)2021
-global wavelist 1(1)5
+global yearlist 2022(1)2022
+*global wavelist 1(1)5
+global wavelist 1(1)4
 
 do ${extraction_code}/copy_over_raw_mrip.do

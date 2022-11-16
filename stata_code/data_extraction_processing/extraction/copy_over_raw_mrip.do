@@ -4,7 +4,7 @@ This is code to copy over the sas7bdat files as dta files. It relies on stat tra
 
 MRIP data is stored in  
 "smb://net/mrfss/products/mrip_estim/Public_data_cal2018"
-
+mount \\net.nefsc.noaa.gov\mrfss to M:\
 
 You made a "mounts" directory for data4
 what you need to do is "mount" it in nautilus and then you can run this code.
