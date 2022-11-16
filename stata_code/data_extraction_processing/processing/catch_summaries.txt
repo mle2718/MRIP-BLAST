@@ -1,4 +1,26 @@
-Ythe<<dd_version: 2>>
+<<dd_version: 2>>
+
+<!---Execute this with:
+
+do $MRIP_BLAST
+
+
+if strmatch("$user","minyangWin"){
+	global project_dir  "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST/" 
+}
+
+
+/* setup directories */
+global code_dir "${project_dir}/stata_code"
+global working_data "${project_dir}/working_data"
+global output_dir "${project_dir}/output"
+
+dyndoc "${code_dir}/data_extraction_processing/processing/catch_summaries.txt", saving(${code_dir}/data_extraction_processing/processing/catch_summaries.html) replace
+
+
+ ---> 
+
+
 
 Effort  statistics 
 ===============================================================
@@ -6,9 +28,9 @@ Effort  statistics
 
 BLAST inputs:
 
-1.  Annual Length-frequency for cod and haddock. 
+1.  Monthly Length-frequency for cod and haddock. <-checking on this.
 2.  Monthly Catch-per-trip for cod and haddock. 
-3.  Total trips.  We will use FY 2022 data, but will need to figure something out for wave 1-2 of 2023..
+3.  Total trips.  We will use FY 2022 data, but will need to figure something out for wave 1-2 of 2023.
 
 Data cleaning
 	
@@ -20,7 +42,7 @@ Data cleaning
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2022_10_27
+global vintage_string 2022_11_16
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
@@ -32,7 +54,7 @@ global last_year = $this_year-1
 <</dd_do>>
 ~~~~
 
-Here are monthly number of trips in Calendar Year <<dd_display: %4.0f $this_year>>. 
+Here are monthly number of trips in Calendar Year <<dd_display: %4.0f $last_year>>. 
 
 
 
@@ -59,6 +81,11 @@ sort year month
 list year month dtrip, abbreviate(16)
 <</dd_do>>
 ~~~~
+
+
+Today's date is <<dd_display: c(current_date)>>, so for testing things out we'll use <<dd_display: %4.0f $last_year>> data to fill in the the September and October of <<dd_display: %4.0f $this_year>>trips.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
+
+
 
 Here are trips, by fishing year:
 
@@ -96,7 +123,7 @@ list , abbreviate(16)
 Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>. 
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common1'_landings_${working_year}.dta", replace
+use "${my_outputdir}/`my_common1'_landings_${this_year}.dta", replace
 sort year month 
 format tot_cat a b1 b2 landings %10.0fc
 <</dd_do>>
@@ -108,7 +135,7 @@ list , abbreviate(16)
 
 
 
-Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year<<dd_display: %4.0f $last_year>>. This uses the 2b95 method.  
+Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year<<dd_display: %4.0f $last_year>>. This uses the 2b95 method. 
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${last_year}.dta", clear
