@@ -241,6 +241,7 @@ foreach file of local cod_wave_ab1{
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
+keep if year==$working_year
 save "$my_outputdir/cod_ab1_$working_year.dta", replace
 
 
@@ -256,6 +257,8 @@ foreach file of local haddock_wave_ab1{
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
+keep if year==$working_year
+
 save "$my_outputdir/haddock_ab1_$working_year.dta", replace
 
 
