@@ -227,7 +227,7 @@ local myv l_in_bin
 	
 	sort year month l_in_bin
 	order year month l_in_bin
-	
+	keep if year==${working_year}
 		
 	save "$my_outputdir/$my_common`myv'_b2_${working_year}.dta", replace
 
