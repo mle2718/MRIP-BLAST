@@ -162,7 +162,7 @@ drop _merge
 rename landings landings_old
 rename trimmed_landings landings
 rename tot_cat tot_cat_old
-gen tot_cat=landings+b2
+gen tot_catch=landings+b2
 }
 
 /* substitute only for months 1 to 4 */
@@ -172,7 +172,7 @@ drop _merge
 clonevar landings_old= landings
 replace landings= trimmed_landings if inlist(month,1,2,3,4)
 rename tot_cat tot_cat_old
-gen tot_cat=landings+b2
+gen tot_catch=landings+b2
 }
 
 
