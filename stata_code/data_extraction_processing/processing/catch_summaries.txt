@@ -112,7 +112,7 @@ Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $l
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common1'_landings_${last_year}.dta", replace
 sort year month 
-format tot_cat a b1 b2 landings* %10.0fc
+format tot_cat* a b1 b2 landings* %10.0fc
 <</dd_do>>
 
 <<dd_do>>
@@ -125,7 +125,7 @@ Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $t
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common1'_landings_${this_year}.dta", replace
 sort year month 
-format tot_cat a b1 b2 landings %10.0fc
+format tot_cat* a b1 b2 landings %10.0fc
 <</dd_do>>
 
 <<dd_do>>
@@ -188,7 +188,7 @@ Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common2'_landings_${last_year}.dta", replace
 sort year month 
-format tot_catch a b1 b2 landings %10.0fc
+format tot_cat* a b1 b2 landings %10.0fc
 <</dd_do>>
 <<dd_do>>
 list , abbreviate(16)
@@ -200,7 +200,7 @@ Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common2'_landings_${this_year}.dta", replace
 sort year month 
-format tot_catch a b1 b2 landings* %10.0fc
+format tot_cat* a b1 b2 landings* %10.0fc
 <</dd_do>>
 <<dd_do>>
 list , abbreviate(16)
