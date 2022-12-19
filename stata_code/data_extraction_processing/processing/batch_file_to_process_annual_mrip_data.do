@@ -42,6 +42,7 @@ capture mkdir "$my_outputdir"
 global working_year  2019
 global working_year  2020
 global working_year  2021
+global working_year  2022
 
 local year $working_year
 global wavelist 1 2 3 4 5 6
