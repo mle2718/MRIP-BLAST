@@ -67,6 +67,7 @@ save "${my_outputdir}/atlanticcod_landings_2b95.dta", replace
 /********************************************************************************/
 foreach yr of numlist 2021 2022{
 	global working_year `yr'
+	global previous_year=$working_year-1
 
 
 global wavelist 1 2 3 4 5 6

@@ -26,4 +26,5 @@ Ensure that your stat-transfer executable can be found. It is set with in profil
 # Notes from 2022
 
 1.  There are no B2 haddock in April.
-2.  There were no B2 haddock that were measures from July - October. I've filled these in with the average of May and June. This is handled in "/stata_code/data_extraction_processing/processing/monthly/process_b2_haddock.do" and is coded with an 'if $working_year==2022' statement.
+2.  There were no B2 haddock that were measured from July - October. I've filled these in with the average of May and June. This is handled in "/stata_code/data_extraction_processing/processing/monthly/process_b2_haddock.do" and is coded with an 'if $working_year==2022' statement.
+3.  There were no B2 cod that were measured from in April. I've filled these in with the average of october of the previous year. I'd normally fill in with May, but the regs in April of 2022 (partially open) are so different from the regs in may (zero possession).   This is handled in "/stata_code/data_extraction_processing/processing/monthly/process_b2_cod.do" and is coded with an 'if $working_year==2022' statement.

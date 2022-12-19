@@ -27,16 +27,29 @@ save `cm'
 
 use "$my_outputdir/cod_b2_$working_year.dta", clear
 
-/* fill in month 6 from 2013 that is missing with month 5 data
+/* fill in month 4 with month 10 from previous year. Fill in month 10 with month 9 of current year.  The april fill-in looks a little crazy it's the best match because of the similar regs.  */
 
-expand 2 if month==5 & year==2013
-drop if month==6 & year==2013
 
-bysort year month l_in_bin: gen mark=_n
-replace month=6 if mark==2 & year==2013 & month==5
+if ($working_year==2022){
+drop if month==10 | month==4
+expand 2 if month==9, gen(mykey)
+replace month=10 if mykey==1
+drop mykey
 
-drop mark
-*/
+preserve
+use "$my_outputdir/cod_b2_$previous_year.dta" if inlist(month,10), clear
+replace month=4 
+replace year=$working_year
+collapse (sum) count, by(year month l_in_bin)
+tempfile stack2
+save `stack2', replace
+restore 
+
+append using `stack2'
+
+}
+
+
 sort year month
 merge m:1 year month using `cm'
 replace release=0 if release==.
