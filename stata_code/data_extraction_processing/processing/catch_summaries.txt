@@ -134,10 +134,16 @@ Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year<<dd_disp
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${last_year}.dta", clear
+
+gen ab1_lbs_per_fish=ab1weight/ab1_count
+gen b2_lbs_per_fish=b2weight/b2_count
+format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
+
 replace ab1weight=ab1weight/2204
 rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
@@ -146,7 +152,7 @@ keep if year==$last_year
 
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count) 
 <</dd_do>>
 ~~~~
 
@@ -156,18 +162,25 @@ Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year <<dd_dis
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${this_year}.dta", clear
+
+gen ab1_lbs_per_fish=ab1weight/ab1_count
+gen b2_lbs_per_fish=b2weight/b2_count
+format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
+
 replace ab1weight=ab1weight/2204
 rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
+
 keep if year==$this_year
 <</dd_do>>
 <<dd_do>>
 
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
@@ -209,18 +222,25 @@ Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${last_year}.dta", clear
+
+gen ab1_lbs_per_fish=ab1weight/ab1_count
+gen b2_lbs_per_fish=b2weight/b2_count
+format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
+
 replace ab1weight=ab1weight/2204
 rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
+
 keep if year==$last_year
 <</dd_do>>
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
@@ -230,20 +250,24 @@ Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_year}.dta", clear
+
+gen ab1_lbs_per_fish=ab1weight/ab1_count
+gen b2_lbs_per_fish=b2weight/b2_count
+format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
+
 replace ab1weight=ab1weight/2204
 rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
-sort year month 
-replace b2mt=. if b2mt==0 & month>=7
-replace b2_count=. if b2_count==0 & month>=7
 
+sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
+
 keep if year==$this_year
 <</dd_do>>
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
