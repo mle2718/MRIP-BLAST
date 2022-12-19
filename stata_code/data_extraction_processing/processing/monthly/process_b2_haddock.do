@@ -34,16 +34,24 @@ keep if year==$working_year
 
 use "$my_outputdir/haddock_b2_$working_year.dta", clear
 
-/* fill in month 6 from 2013 that is missing with month 5 data
+/*  In CY 2022, there are no B2 lengths for months 7-10 and month 4. Fix this. */
 
-expand 2 if month==5 & year==2013
-drop if month==6 & year==2013
+if ($working_year==2022){
 
-bysort year month l_in_bin: gen mark=_n
-replace month=6 if mark==2 & year==2013 & month==5
+keep if month>=5 & month<=6
+preserve
+collapse (sum) count, by(l_in_bin year)
+expand 5
+bysort year l_in_bin: gen month=_n+6
+replace month=4 if month==11
+tempfile stackon
+save `stackon'
+restore
+append using `stackon'
+sort year month l_in_bin
+order year month l_in_bin 
 
-drop mark
-*/
+}
 
 sort year month
 merge m:1 year month using `cm'
