@@ -21,3 +21,9 @@ Ensure that your stat-transfer executable can be found. It is set with in profil
 
 # Files that need to be run
 1. ``extraction_wrapper.do'' and ``process_wrapper.do`` are the only files that need to be run
+
+
+# Notes from 2022
+
+1.  There are no B2 haddock in April.
+2.  There were no B2 haddock that were measures from July - October. I've filled these in with the average of May and June. This is handled in "/stata_code/data_extraction_processing/processing/monthly/process_b2_haddock.do" and is coded with an 'if $working_year==2022' statement.
