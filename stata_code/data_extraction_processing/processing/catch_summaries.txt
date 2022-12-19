@@ -15,8 +15,7 @@ global code_dir "${project_dir}/stata_code"
 global working_data "${project_dir}/working_data"
 global output_dir "${project_dir}/output"
 
-dyndoc "${code_dir}/data_extraction_processing/processing/catch_summaries.txt", saving(${code_dir}/data_extraction_processing/processing/catch_summaries.html) replace
-
+dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
 
  ---> 
 
@@ -28,14 +27,10 @@ Effort  statistics
 
 BLAST inputs:
 
-1.  Monthly Length-frequency for cod and haddock. <-checking on this.
+1.  Annual Length-frequency for cod and haddock. 
 2.  Monthly Catch-per-trip for cod and haddock. 
-3.  Total trips.  We will use FY 2022 data, but will need to figure something out for wave 1-2 of 2023.
+3.  Total trips.  We will use FY 2022 data, but use Waves 1 and 2 from 2022  in place of the Waves 1 and 2 of 2023 (as usual). There's no trips in Wave 6.
 
-Data cleaning
-	
-1.  id_code=="1757420210428005."  This is from April 2021.  I always drop this trip when computing anything cod related (L-F, C/trip, trips).
-2. id_code== "1792820210410001" This is from April 2021. We drop trip when we are computing total trips, but we leave it when we calcluate catch-per-trip and length-per-trip
 
 
 ~~~~
@@ -116,7 +111,7 @@ format tot_cat* a b1 b2 landings* %10.0fc
 <</dd_do>>
 
 <<dd_do>>
-list , abbreviate(16)
+list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
@@ -129,7 +124,7 @@ format tot_cat* a b1 b2 landings %10.0fc
 <</dd_do>>
 
 <<dd_do>>
-list , abbreviate(16)
+list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
@@ -151,7 +146,7 @@ keep if year==$last_year
 
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
+list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
@@ -172,7 +167,7 @@ keep if year==$this_year
 <</dd_do>>
 <<dd_do>>
 
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
+list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
@@ -191,7 +186,7 @@ sort year month
 format tot_cat* a b1 b2 landings %10.0fc
 <</dd_do>>
 <<dd_do>>
-list , abbreviate(16)
+list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
@@ -203,7 +198,7 @@ sort year month
 format tot_cat* a b1 b2 landings* %10.0fc
 <</dd_do>>
 <<dd_do>>
-list , abbreviate(16)
+list , abbreviate(16) sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
@@ -225,13 +220,13 @@ keep if year==$last_year
 <</dd_do>>
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
+list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
 
 
-Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  April of 2022 had no B1s or B2s (see two tables up).  However,  as far as I can tell, there were no B2's that were measured in July, August, September or October. My code can't handle that very well, so I don't have the B2 weights for July -October.
+Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  April of 2022 had no B1s or B2s (see two tables up).  There were no measured B2s in July - October. I've filled in their length distributions with the May and June average. 
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_year}.dta", clear
@@ -248,20 +243,9 @@ format ab1_count b2_count %10.0fc
 keep if year==$this_year
 <</dd_do>>
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
+list year month ab1mt b2mt ab1_count b2_count , abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
 <</dd_do>>
 ~~~~
-
-If the average weights of released haddock in July-October is the same as in the other months, we're looking at b2 weights of 32.9mt, 47.8, 38.9, 9.0 in those four months, for a total of 128.5mt of b2s.
-
-
-
-
-
-
-
-
-
 
 
 
