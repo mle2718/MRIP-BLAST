@@ -42,7 +42,7 @@ Data cleaning
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2022_11_16
+global vintage_string 2022_12_08
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
@@ -83,7 +83,7 @@ list year month dtrip, abbreviate(16)
 ~~~~
 
 
-Today's date is <<dd_display: c(current_date)>>, so for testing things out we'll use <<dd_display: %4.0f $last_year>> data to fill in the the September and October of <<dd_display: %4.0f $this_year>>trips.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
+Today's date is <<dd_display: c(current_date)>>. I am using preliminary Wave 5 data for Sept and October of 2022.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
 
 
 
@@ -107,7 +107,7 @@ Catch Statistics for Cod
 ===============================================================
 
 
-Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $last_year>>.   Landings are the 2b95 method and landings_old are straight out of MRIP:
+Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $last_year>>.  
 ~~~~
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common1'_landings_${last_year}.dta", replace
@@ -135,7 +135,7 @@ list , abbreviate(16)
 
 
 
-Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year<<dd_display: %4.0f $last_year>>. This uses the 2b95 method. 
+Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year<<dd_display: %4.0f $last_year>>. 
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${last_year}.dta", clear
@@ -195,7 +195,7 @@ list , abbreviate(16)
 <</dd_do>>
 ~~~~
 
-Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>.
+Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  April is a little strange: there's no b1s or b2s. I looked at the raw data from this wave and there were only 2 observations in "catch_20222" for haddock that have positive wp_catch.  There's a few entries with wp_catch=0 that have releases.
 ~~~~
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common2'_landings_${this_year}.dta", replace
@@ -231,7 +231,7 @@ list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
 
 
 
-Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>.
+Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  April of 2022 had no B1s or B2s (see two tables up).  However,  as far as I can tell, there were no B2's that were measured in July, August, September or October. My code can't handle that very well, so I don't have the B2 weights for July -October.
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_year}.dta", clear
@@ -240,6 +240,9 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 sort year month 
+replace b2mt=. if month>=7
+replace b2_count=. if month>=7
+
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
 keep if year==$this_year
@@ -249,9 +252,7 @@ list year month ab1mt b2mt ab1_count b2_count , abbreviate(16)
 <</dd_do>>
 ~~~~
 
-
-
-
+If the average weights of released haddock in July-October is the same as in the other months, we're looking at b2 weights of 32.9mt, 47.8, 38.9, 9.0 in those four months, for a total of 128.5mt of b2s.
 
 
 
