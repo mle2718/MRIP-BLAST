@@ -240,8 +240,8 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 sort year month 
-replace b2mt=. if month>=7
-replace b2_count=. if month>=7
+replace b2mt=. if b2mt==0 & month>=7
+replace b2_count=. if b2_count==0 & month>=7
 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
