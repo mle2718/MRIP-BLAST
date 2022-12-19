@@ -18,7 +18,7 @@ global cmin 22
 
 /* which fishing year do you want */
 *local yr1 2021 
-local yr1 2022 
+local yr1 $this_working_year 
 
 local lastyr=`yr1'-1
 
