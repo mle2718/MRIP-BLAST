@@ -57,7 +57,8 @@ capture ! "$stattransfer" "`sourcedir'/trip_`year'`wave'.sas7bdat" "${data_raw}/
 */
 
 local mylist: dir "${data_raw}" files "*.dta"
-
+local subtract "ma_site_allocation.dta"
+local mylist: list mylist - subtract
 
 foreach file of local mylist{
 use ${data_raw}/`file', clear
@@ -72,7 +73,7 @@ rm ${data_raw}/`file'
 
 
 
-*/
+
 
 
 
