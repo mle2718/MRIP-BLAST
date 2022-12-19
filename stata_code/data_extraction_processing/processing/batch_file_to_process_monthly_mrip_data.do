@@ -236,8 +236,8 @@ foreach sp in atlanticcod haddock{
 /*stack together multiple, cleanup extras and delete */
 local cod_wave_ab1: dir "$my_outputdir" files "atlanticcodl_in_bin_a1b1*.dta"
 
+clear
 foreach file of local cod_wave_ab1{
-	clear
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
@@ -250,10 +250,8 @@ save "$my_outputdir/cod_ab1_$working_year.dta", replace
 
 /*stack together multiple, cleanup extras and delete */
 local haddock_wave_ab1: dir "$my_outputdir" files "haddockl_in_bin_a1b1*.dta"
-
+clear
 foreach file of local haddock_wave_ab1{
-	clear
-
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
