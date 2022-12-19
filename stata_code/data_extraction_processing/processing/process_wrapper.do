@@ -18,6 +18,7 @@ capture mkdir "$annual"
 global stacked_month "${workdir}/stacked_monthly"
 capture mkdir "$stacked_month"
 
+/*this global may not do anything */
 global this_working_year 2022
 
 
@@ -53,8 +54,11 @@ do "$processing_code/subset_monthly_mrip.do"
 
 do "$processing_code/convert_monthly_to_annual.do"
 
+/* examine jointness of cod and haddock catch 
+do "$processing_code/monthly/joint_catch_frequencies.do"
+*/
+
+/* Write to a html file.
 
 
-
-/* Write to a html file.*/
-dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
+dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace*/
