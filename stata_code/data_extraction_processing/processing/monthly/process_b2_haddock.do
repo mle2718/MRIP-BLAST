@@ -71,6 +71,7 @@ sort year month l_in_bin
 keep if year==$working_year
 
 /* save */
+notes: the file haddock_b2_counts_$working_year.dta contains the length distribution corresponding to the population of B2s.  The sum of (b2_count) is the total discards.
 
 save  "$my_outputdir/haddock_b2_counts_$working_year.dta", replace
 
@@ -115,17 +116,6 @@ sort year month lngcatinches
 label var lngcatinches "length in inches"
 
 save  "$my_outputdir/haddock_size_class_$working_year.dta", replace
-
-
-/* compute the numbers of sub-legal fish retained */
-use `tth1', clear
-keep year month l_in_bin ab1_count countnumbers
-gen fy=year
-replace fy=fy-1 if month<=4
-keep if year==$working_year
-
-export excel year month fy l_in_bin ab1_count count using "$my_outputdir/haddock_sublegal_retention_$working_year.xls", firstrow(variables) replace
-save  "$my_outputdir/haddock_sublegals_$working_year.dta", replace
 
 
 
