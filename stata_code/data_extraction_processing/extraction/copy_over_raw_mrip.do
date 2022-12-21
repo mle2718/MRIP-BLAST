@@ -3,9 +3,12 @@ This is code to copy over the sas7bdat files as dta files. It relies on stat tra
 
 
 MRIP data is stored in  
-"smb://net/mrfss/products/mrip_estim/Public_data_cal2018"
-mount \\net.nefsc.noaa.gov\mrfss to M:\
 
+"smb://net/mrfss/products/mrip_estim/Public_data_cal2018"
+
+Windows, just mount \\net.nefsc.noaa.gov\mrfss to M:\
+
+Unix
 You made a "mounts" directory for data4
 what you need to do is "mount" it in nautilus and then you can run this code.
 http://colans.net/blog/how-mount-windows-file-share-ubuntu-1304
@@ -16,7 +19,6 @@ ln -s /run/user..... ~/mounts/data4
 ! cp "`sourcedir'/trip_20182.sas7bdat" "${data_raw}/trip_20182.sas7bdat"
 
 
-In Windows, you 
 
 
 */
@@ -34,10 +36,10 @@ cd "${data_raw}"
  foreach year of numlist $yearlist{
 	foreach wave of numlist $wavelist{
 		foreach type in trip size_b2 size catch{
+
 			
-			capture copy  "`sourcedir'/`type'_`year'`wave'.sas7bdat" "${data_raw}/`type'_`year'`wave'.sas7bdat", replace
-			capture ! "$stattransfer" "${data_raw}/`type'_`year'`wave'.sas7bdat" "${data_raw}/`type'_`year'`wave'.dta" -Y
-			capture rm  "${data_raw}/`type'_`year'`wave'.sas7bdat"
+			capture ! "$stattransfer"  "`sourcedir'/`type'_`year'`wave'.sas7bdat" "${data_raw}/`type'_`year'`wave'.dta" -Y
+
 			
 		}
 	}
@@ -45,16 +47,6 @@ cd "${data_raw}"
 
 
 
-
-/*
-
-capture ! "$stattransfer" "`sourcedir'/trip_`year'`wave'.sas7bdat" "${data_raw}/trip_`year'`wave'.dta" -Y
-		capture ! $stattransfer "`sourcedir'/size_b2_`year'`wave'.sas7bdat" "${data_raw}/size_b2_`year'`wave'.dta" -Y
-		capture ! $stattransfer "`sourcedir'/size_`year'`wave'.sas7bdat" "${data_raw}/size_`year'`wave'.dta" -Y 
-		capture ! $stattransfer "`sourcedir'/catch_`year'`wave'.sas7bdat" "${data_raw}/catch_`year'`wave'.dta" -Y 
-		
-
-*/
 
 local mylist: dir "${data_raw}" files "*.dta"
 local subtract "ma_site_allocation.dta"
