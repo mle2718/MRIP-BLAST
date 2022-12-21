@@ -60,5 +60,6 @@ do "$processing_code/monthly/joint_catch_frequencies.do"
 
 /* Write to a html file.*/
 
-
+if ($this_working_year==2022){
 dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
+}
