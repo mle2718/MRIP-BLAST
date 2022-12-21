@@ -27,7 +27,7 @@ save `cm'
 
 use "$my_outputdir/cod_b2_$working_year.dta", clear
 
-/* fill in month 4 with month 10 from previous year. Fill in month 10 with month 9 of current year.  The april fill-in looks a little crazy it's the best match because of the similar regs.  */
+/* fill in month 4 with months 9+10 from previous year. Fill in month 10 with month 9 of current year.  The april fill-in looks a little crazy it's the best match because of the similar regs.  */
 
 
 if ($working_year==2022){
@@ -37,7 +37,7 @@ replace month=10 if mykey==1
 drop mykey
 
 preserve
-use "$my_outputdir/cod_b2_$previous_year.dta" if inlist(month,10), clear
+use "$my_outputdir/cod_b2_$previous_year.dta" if inlist(month,9,10), clear
 replace month=4 
 replace year=$working_year
 collapse (sum) count, by(year month l_in_bin)
