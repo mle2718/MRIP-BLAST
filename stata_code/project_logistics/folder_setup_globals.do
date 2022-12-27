@@ -28,6 +28,16 @@ if strmatch("$user","minyangWin"){;
 };
 
 
+if strmatch("$user","minyangNix"){;
+	global my_projdir "${myroot}/BLAST/READ-SSB-Lee-MRIP-BLAST";
+	global BLAST_Data "$[myroot}/BLAST/projects/READ-SSB-Lee-BLAST";
+
+};
+
+
+
+
+
 global my_codedir "${my_projdir}/stata_code";
 global extract_process "${my_codedir}/data_extraction_processing";
 global extraction_code "${extract_process}/extraction";

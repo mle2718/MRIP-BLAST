@@ -18,6 +18,10 @@ if strmatch("$user","minyangWin"){;
 global my_projdir "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST";
 
 };
+if strmatch("$user","minyangNix"){;
+global my_projdir "${myroot}/BLAST/READ-SSB-Lee-MRIP-BLAST";
+
+};
 
 
 cap mkdir $my_projdir;
