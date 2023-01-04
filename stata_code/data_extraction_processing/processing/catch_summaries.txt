@@ -69,7 +69,8 @@ And here are monthly number trips for <<dd_display: %4.0f $this_year>>.
 ~~~~
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common1'_`my_common2'_target_${this_year}.dta", replace
-sort year month 
+sort year month
+local april=dtrip[1] 
 <</dd_do>>
 
 <<dd_do>>
@@ -77,8 +78,9 @@ list year month dtrip, abbreviate(16)
 <</dd_do>>
 ~~~~
 
+Data was processed on <<dd_display: c(current_date)>>. 
 
-Today's date is <<dd_display: c(current_date)>>. I am using preliminary Wave 5 data for Sept and October of 2022.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
+I am using preliminary Wave 5 data for Sept and October of 2022.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
 
 
 
@@ -89,6 +91,15 @@ Here are trips, by fishing year:
 use "${FY_dir}/FY_targeting.dta", replace
 /* 2018 has partial data in it (From April of 2019)*/
 drop if fishing_year<$last_year
+sort fishing_year
+expand 2 if fishing_year==${this_year}, gen(tag)
+replace dtrip=dtrip+`april' if fishing_year==${this_year} & tag==1
+tostring fishing_year, replace
+replace fishing_year=fishing_year+"Proj" if fishing_year=="${this_year}" & tag==1
+replace fishing_year=fishing_year+"Actual" if fishing_year=="${this_year}" & tag==0
+drop tag
+sort fishing_year
+
 <</dd_do>>
 
 <<dd_do>>
@@ -203,7 +214,7 @@ list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
-Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  April is a little strange: there's no b1s or b2s. I looked at the raw data from this wave and there were only 2 observations in "catch_20222" for haddock that have positive wp_catch.  There's a few entries with wp_catch=0 that have releases.
+Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  With the data update, there are both b1's and B2s in April.
 ~~~~
 <<dd_do:quietly>>
 use "${my_outputdir}/`my_common2'_landings_${this_year}.dta", replace
@@ -246,7 +257,7 @@ list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, 
 
 
 
-Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  April of 2022 had no B1s or B2s (see two tables up).  There were no measured B2s in July - October. I've filled in their length distributions with the May and June average. 
+Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>. With the data update, there are both b1's and B2s in April.  There are also measured B2 haddock from July-October now.  The weights per fish look reasonable.
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_year}.dta", clear
