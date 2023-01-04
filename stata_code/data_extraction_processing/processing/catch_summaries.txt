@@ -37,7 +37,7 @@ BLAST inputs:
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2022_12_20
+global vintage_string 2023_01_04
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
