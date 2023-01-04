@@ -3,33 +3,19 @@ This is code to copy over the sas7bdat files as dta files. It relies on stat tra
 
 
 MRIP data is stored in  
-
 "smb://net/mrfss/products/mrip_estim/Public_data_cal2018"
-
 Windows, just mount \\net.nefsc.noaa.gov\mrfss to M:\
-
-Unix
-You made a "mounts" directory for data4
-what you need to do is "mount" it in nautilus and then you can run this code.
-http://colans.net/blog/how-mount-windows-file-share-ubuntu-1304
-/run/user/1000/gvfs/smb-share:server=net,share=mrfss/products/mrip_estim/Public_data_cal2018
-ln -s /run/user..... ~/mounts/data4
-
-
-! cp "`sourcedir'/trip_20182.sas7bdat" "${data_raw}/trip_20182.sas7bdat"
-
-
-
 
 */
 /*Change this local to the YYYYW that you want to get*/
 
-
-local sourcedir "/run/user/1000/gvfs/smb-share:server=net,share=mrfss/$mrip_estim_pub_2018"
-
+/*windows, if MRFSS is mounted to M */
 local sourcedir "M:/$mrip_estim_pub_2018"
 
+/*networked linux */
+local sourcedir "/home/nefsc/mrfss/$mrip_estim_pub_2018"
 
+/* this probably isn't necessary */
 cd "${data_raw}"
 
 /*copy over sas7bdats. Convert them to stata dta */ 
@@ -44,7 +30,6 @@ cd "${data_raw}"
 		}
 	}
 }
-
 
 
 
