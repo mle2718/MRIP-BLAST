@@ -34,7 +34,7 @@ keep if year==$working_year
 
 use "$my_outputdir/haddock_b2_$working_year.dta", clear
 
-/*  In CY 2022, there are no B2 lengths for months 7-10 and month 4. Fix this. */
+/*  In CY 2022, there are no B2 lengths for months 7-10 and month 4. Fix this. 
 
 if ($working_year==2022){
 
@@ -52,7 +52,7 @@ sort year month l_in_bin
 order year month l_in_bin 
 
 }
-
+*/
 sort year month
 merge m:1 year month using `cm'
 replace release=0 if release==.

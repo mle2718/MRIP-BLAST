@@ -27,7 +27,7 @@ save `cm'
 
 use "$my_outputdir/cod_b2_$working_year.dta", clear
 
-/* fill in month 4 with months 9+10 from previous year. Fill in month 10 with month 9 of current year.  The april fill-in looks a little crazy it's the best match because of the similar regs.  */
+/* fill in month 4 with months 9+10 from previous year. Fill in month 10 with month 9 of current year.  The april fill-in looks a little crazy it's the best match because of the similar regs.  
 
 
 if ($working_year==2022){
@@ -48,7 +48,7 @@ restore
 append using `stack2'
 
 }
-
+*/
 
 sort year month
 merge m:1 year month using `cm'
