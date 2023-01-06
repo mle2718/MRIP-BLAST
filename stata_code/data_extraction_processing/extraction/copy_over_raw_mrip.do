@@ -9,14 +9,24 @@ Windows, just mount \\net.nefsc.noaa.gov\mrfss to M:\
 */
 /*Change this local to the YYYYW that you want to get*/
 
-/*windows, if MRFSS is mounted to M */
-local sourcedir "M:/$mrip_estim_pub_2018"
 
-/*networked linux */
-local sourcedir "/home/nefsc/mrfss/$mrip_estim_pub_2018"
 
-/* this probably isn't necessary */
-cd "${data_raw}"
+/*minyangWin */
+if strmatch("$user","minyangWin"){
+	local sourcedir "M:/$mrip_estim_pub_2018"
+}
+
+
+
+if strmatch("$user","minyangNix"){
+	local sourcedir "/home/nefsc/mrfss/$mrip_estim_pub_2018"
+}
+
+
+
+
+/* this probably isn't necessary
+cd "${data_raw}" */
 
 /*copy over sas7bdats. Convert them to stata dta */ 
  foreach year of numlist $yearlist{
