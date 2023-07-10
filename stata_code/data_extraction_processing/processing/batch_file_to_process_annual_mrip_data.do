@@ -240,7 +240,6 @@ foreach file of local cod_wave_b2{
 }
 
 
-capture destring month, replace
 save "$my_outputdir/cod_b2_annual_$working_year.dta", replace
 	clear
 foreach file of local haddock_wave_b2{
@@ -248,8 +247,6 @@ foreach file of local haddock_wave_b2{
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
-
-capture destring month, replace
 
 save "$my_outputdir/haddock_b2_annual_$working_year.dta", replace
 

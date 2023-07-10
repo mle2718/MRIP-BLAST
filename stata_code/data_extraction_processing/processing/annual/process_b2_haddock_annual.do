@@ -15,7 +15,6 @@ sort year
 save `claim_harvest'
 
 use  "$my_outputdir/haddock_landings_annual_$working_year.dta", clear
-destring month, replace
 rename b2 release
 keep year release
 tempfile cm
