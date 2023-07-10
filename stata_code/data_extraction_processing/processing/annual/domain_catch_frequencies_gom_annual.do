@@ -1,4 +1,4 @@
-/* This is a file that produces a dataset that contains # of fish encountered per trip.
+/* This is a file that produces a dataset that contains # of fish encountered per trip aggregated at the annual level
 This is a port of Scott's "domain_catch_frequencies_gom_cod_wave_2013.sas"
 
 
@@ -185,12 +185,10 @@ To do this:
 	replace harvest=0 if strmatch(common, "$my_common")==0
 	replace release=0 if strmatch(common, "$my_common")==0
 
+
 *catch frequency adjustments for grouped catch (multiple angler catches reported on a single record);
 replace claim=claim/cntrbtrs if cntrbtrs>0 
-  foreach var of varlist tot_cat landing claim harvest release{
-	replace `var'=round(`var')
- }
- 
+
 
 /*3.  We sort on year, strat_id, psu_id, id_code, "no_dup", and "my_dom_id_string".
 4. After sorting, we generate a count variable (count_obs1 from 1....n) and we keep only the "first" observations within each "year, strat_id, psu_id, and id_codes" group.*/
@@ -198,10 +196,62 @@ replace claim=claim/cntrbtrs if cntrbtrs>0
 bysort year strat_id psu_id id_code (no_dup my_dom_id_string): gen count_obs1=_n
 keep if count_obs1==1
 
+/*
+As suggested by John Foster (MRIP), catch-per-trip at the angler level can be computed by:
+	1) dividing claim by cntrbtrs (done above already). Note that when there is group claim and multiple interviews for a single fishing party, 
+	   only the leader will have positive value for claim, non-leaders will have zero claim. 
+	2) summing harvest and release by (strat_id,psu_id, leader)
+	3) dividing harvest and release by the count of id_codes within a leader 
+	4) multiplying wp_int by the count of id_codes within a leader to create new_wp_int
+	5) Once new_wp_ints are computed, keep only the first observation within each strat_id psu_id leader
+	6) Add claim to new_harvest and new_release to get new_tot_cat
+	7) specify the new_wp_ints in the svy command and use new_tot_cat as the catch variable
+
+	Note that in some cases, the number of anglers contributing to a claim is different than the number of 
+	anglers in the fishing party. This creates a divergence in estimated total harvest using the raw data versus using the 
+	adjusted data because we multiply the wp_ints by the total number of anglers interviewed, not by the number of anglers 
+	contributing to total claim. Subsequqntly, there will be small differences in total catch between the original and adjusted wp_ints and catch values.
+	John Foster recommend re-scaling the new_wp_ints by the ratio of original total catch/adjusted total catch if having 
+	adjusted total catch=original total catch is desired
+*/
+*2) 
+ foreach var of varlist harvest release{
+	egen sum_`var'=sum(`var'), by(strat_id psu_id leader)
+}
+
+*3) 
+gen tab=1
+egen count_id_codes=sum(tab), by(strat_id psu_id leader)
+drop tab 
+
+foreach var of varlist sum_harvest sum_release{
+	gen new_`var'=`var'/count_id_codes
+}
+
+*4) 
+gen new_wp_int=wp_int*count_id_codes
+
+*5) 
+cap drop first
+bysort strat_id psu_id leader: gen first=1 if _n==1
+keep if first==1
+
+*6) 
+replace tot_cat=claim+new_sum_harvest+new_sum_release
+*get integer values of catch:
 
 
+
+  foreach var of varlist tot_cat landing claim harvest release{
+	replace `var'=round(`var')
+ }
+
+
+
+
+*7) 
 sort year strat_id psu_id id_code
-svyset psu_id [pweight= wp_catch], strata(var_id) singleunit(certainty)
+svyset psu_id [pweight= new_wp_int], strata(var_id) singleunit(certainty)
 
  
 local myv tot_cat
