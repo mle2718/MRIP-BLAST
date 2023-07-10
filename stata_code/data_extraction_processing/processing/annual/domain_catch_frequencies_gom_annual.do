@@ -1,4 +1,4 @@
-/* This is a file that produces a dataset that contains # of fish encountered per trip.
+/* This is a file that produces a dataset that contains # of fish encountered per trip aggregated at the annual level
 This is a port of Scott's "domain_catch_frequencies_gom_cod_wave_2013.sas"
 
 
