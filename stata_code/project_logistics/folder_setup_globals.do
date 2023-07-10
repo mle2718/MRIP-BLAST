@@ -22,8 +22,7 @@ if strmatch("$user","minyang"){;
 if strmatch("$user","minyangWin"){;
 	global my_projdir "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST";
 	global BLAST_Data "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-BLAST";
-	quietly do "C:/Users/Min-Yang.Lee/Documents/common/odbc_setup_macros.do";
-	global oracle_cxn " $mysole_conn lower";
+	global oracle_cxn " $mysole_conn";
 
 };
 
