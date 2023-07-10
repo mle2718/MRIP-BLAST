@@ -216,7 +216,7 @@ As suggested by John Foster (MRIP), catch-per-trip at the angler level can be co
 */
 *2) 
  foreach var of varlist harvest release{
-	egen sum_`v'=sum(`v'), by(strat_id psu_id leader)
+	egen sum_`var'=sum(`var'), by(strat_id psu_id leader)
 }
 
 *3) 
@@ -225,13 +225,14 @@ egen count_id_codes=sum(tab), by(strat_id psu_id leader)
 drop tab 
 
 foreach var of varlist sum_harvest sum_release{
-	gen new_`v'=`v'/count_id_codes
+	gen new_`var'=`var'/count_id_codes
 }
 
 *4) 
 gen new_wp_int=wp_int*count_id_codes
 
 *5) 
+cap drop first
 bysort strat_id psu_id leader: gen first=1 if _n==1
 keep if first==1
 
