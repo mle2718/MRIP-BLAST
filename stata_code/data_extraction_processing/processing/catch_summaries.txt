@@ -6,7 +6,7 @@ do $MRIP_BLAST
 
 
 if strmatch("$user","minyangWin"){
-	global project_dir  "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST/" 
+	global project_dir  "V:/READ-SSB-Lee-MRIP-BLAST/" 
 }
 
 
@@ -29,7 +29,7 @@ BLAST inputs:
 
 1.  Annual Length-frequency for cod and haddock. 
 2.  Monthly Catch-per-trip for cod and haddock. 
-3.  Total trips.  We will use FY 2022 data, but use Waves 1 and 2 from 2022  in place of the Waves 1 and 2 of 2023 (as usual). There's no trips in Wave 6.
+3.  Total trips.  We will use FY 2023 data, but use Waves 1 and 2 from 2023  in place of the Waves 1 and 2 of 2024 (as usual). There's no trips in Wave 6.
 
 
 
@@ -37,14 +37,14 @@ BLAST inputs:
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2023_01_04
+global vintage_string 2023_11_02
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
 local my_common1 "atlanticcod"
 local my_common2 "haddock"
 
-global this_year = 2022
+global this_year = 2023
 global last_year = $this_year-1
 <</dd_do>>
 ~~~~
@@ -80,7 +80,8 @@ list year month dtrip, abbreviate(16)
 
 Data was processed on <<dd_display: c(current_date)>>. 
 
-I am using preliminary Wave 5 data for Sept and October of 2022.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
+
+When the data is finalized, we use preliminary Wave 4 data for Sept and October of 2023.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
 
 
 
@@ -106,7 +107,7 @@ sort fishing_year
 list, abbreviate(16)
 <</dd_do>>
 ~~~~
-FY 2022 data is partial
+FY 2023 data is partial
 
 
 Catch Statistics for Cod  
