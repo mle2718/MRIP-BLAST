@@ -19,7 +19,13 @@ global stacked_month "${workdir}/stacked_monthly"
 capture mkdir "$stacked_month"
 
 /*this global controls a few other subfiles*/
-global this_working_year 2022
+global this_working_year 2023
+
+global process_list 2022 2023
+
+
+*global stacked_dir "${workdir}/stacked_monthly"
+global BLAST_DIR "${BLAST_root}/cod_haddock_fy2024/source_data/mrip"
 
 
 
@@ -60,6 +66,6 @@ do "$processing_code/monthly/joint_catch_frequencies.do"
 
 /* Write to a html file.*/
 
-if ($this_working_year==2022){
+if ($this_working_year==2023){
 dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
 }
