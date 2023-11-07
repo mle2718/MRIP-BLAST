@@ -330,6 +330,13 @@ do "${processing_code}/monthly/haddock_plus_directed_trips_by_month.do"
 
 do "${processing_code}/monthly/cod_haddock_directed_trips_by_month.do"
 
+
+
+do "${processing_code}/monthly/cod_haddock_directed_trips_by_month_mode.do"
+
+
+
+
 /* caught/targeted cod by wave */
 do "${processing_code}/monthly/cod_directed_trips_by_month.do"
 
