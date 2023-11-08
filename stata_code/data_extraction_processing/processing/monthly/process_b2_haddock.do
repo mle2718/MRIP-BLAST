@@ -65,7 +65,21 @@ gen prob=count/`tt'
 
 gen b2_count=prob*release
 
-keep year month l_in_bin b2_count
+
+tempvar ttt
+bysort year month: egen `ttt'=total(count_UW)
+gen probUW=count_UW/`ttt'
+
+gen b2_UWcount=probUW*release
+
+
+
+
+
+
+
+
+keep year month l_in_bin b2_count b2_UWcount
 
 sort year month l_in_bin
 keep if year==$working_year
@@ -104,11 +118,19 @@ save "$my_outputdir/haddock_ab1_counts_$working_year.dta", replace
 merge 1:1 year month l_in_bin using  "$my_outputdir/haddock_b2_counts_$working_year.dta"
 replace ab1_count=0 if ab1_count==.
 replace b2_count=0 if b2_count==.
+replace b2_UWcount=0 if b2_UWcount==.
+
 gen countnumbersoffish=round(ab1_count+b2_count)
+gen UWcountnumbersoffish=round(ab1_count+b2_UWcount)
+
 tempfile tth1
 save `tth1'
 
-keep year month l_in_bin countnumbersoffish 
+keep year month l_in_bin countnumbersoffish UWcountnumbersoffish
+
+/*we will use the Weighted (countnumbersoffish) for haddock
+*/
+drop UWcountnumbersoffish
 
 rename l_in_bin lngcatinches
 sort year month lngcatinches
