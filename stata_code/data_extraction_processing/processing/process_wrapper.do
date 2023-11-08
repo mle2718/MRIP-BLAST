@@ -21,7 +21,7 @@ capture mkdir "$stacked_month"
 /*this global controls a few other subfiles*/
 global this_working_year 2023
 
-global process_list 2022 2023
+global process_list 2021 2022 2023
 
 
 *global stacked_dir "${workdir}/stacked_monthly"
@@ -66,6 +66,15 @@ do "$processing_code/monthly/joint_catch_frequencies.do"
 
 /* Write to a html file.*/
 
-if ($this_working_year==2023){
+global this_working_year 2022
 dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
-}
+
+
+global this_working_year 2023
+dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
+
+
+
+
+
+
