@@ -166,6 +166,9 @@ replace l_in_bin=0 if strmatch(common_dom, "$my_common")==0
 
 
 sort year w2 strat_id psu_id id_code
+
+preserve
+
 svyset psu_id [pweight= wp_size], strata(var_id) singleunit(certainty)
 
  
@@ -228,8 +231,84 @@ local myv l_in_bin
 	sort year month l_in_bin
 	order year month l_in_bin
 	keep if year==${working_year}
-		
+	tempfile b2W
+	save `b2W', replace
+	
+
+restore
+
+/*this overkill, because I believe I just have to 
+tab `myv' my_dom_id_string, count
+but then I'd have to rewrite some 
+*/
+svyset psu_id, strata(var_id) singleunit(certainty)
+
+ 
+local myv l_in_bin
+
+	svy: tab `myv' my_dom_id_string, count
+	/*save some stuff  
+	matrix of proportions, row names, column names, estimate of total population size*/
+	mat eP=e(Prop)
+	mat eR=e(Row)'
+	mat eC=e(Col)
+	local PopN=e(N_pop)
+
+	local mycolnames: colnames(eC)
+	mat colnames eP=`mycolnames'
+	
+	clear
+	/*read the eP into a dataset and convert proportion of population into numbers*/
+	svmat eP, names(col)
+	foreach var of varlist *{
+		replace `var'=`var'*`PopN'
+	}
+	/*read in the "row" */
+	svmat eR
+	order eR
+	rename eR `myv'
+	
+
+	
+	keep `myv' GOM*
+	drop *_z*
+	gen year=$working_year
+	
+	
+	*if there are GOM variables, then do some stuff there will be GOM _species variables if qui desc produces r(k) >=2
+	qui desc
+	if r(k)>=3{
+	foreach var of varlist GOM*{
+	tokenize `var', parse("_")
+	rename `var' `1'`3'
+	}
+	
+	
+	reshape long GOM, i(l_in_bin) j(month)
+	rename GOM count_UW
+	}
+	else{
+	keep year
+	expand 12
+	gen month=_n
+	duplicates drop
+	drop _expand
+	gen l_in_bin=0
+	gen count=0
+	}
+	
+	
+	
+	
+	sort year month l_in_bin
+	order year month l_in_bin
+	keep if year==${working_year}
+	
+	merge 1:1 year month l_in_bin using `b2W'
+	assert _merge==3
+	drop _merge
 	save "$my_outputdir/$my_common`myv'_b2_${working_year}.dta", replace
+
 
 
 
