@@ -37,15 +37,15 @@ BLAST inputs:
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2023_11_02
+global vintage_string 2023_11_07
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
 local my_common1 "atlanticcod"
 local my_common2 "haddock"
 
-global this_year = 2023
-global last_year = $this_year-1
+/*global this_working_year = 2023 */
+global last_year = $this_working_year - 1 
 <</dd_do>>
 ~~~~
 
@@ -65,10 +65,10 @@ list year month dtrip, abbreviate(16)
 ~~~~
 
 
-And here are monthly number trips for <<dd_display: %4.0f $this_year>>.  
+And here are monthly number trips for <<dd_display: %4.0f $this_working_year>>.  
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common1'_`my_common2'_target_${this_year}.dta", replace
+use "${my_outputdir}/`my_common1'_`my_common2'_target_${this_working_year}.dta", replace
 sort year month
 local april=dtrip[1] 
 <</dd_do>>
@@ -81,27 +81,27 @@ list year month dtrip, abbreviate(16)
 Data was processed on <<dd_display: c(current_date)>>. 
 
 
-When the data is finalized, we use preliminary Wave 4 data for Sept and October of 2023.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
+When the data is finalized, we use preliminary Wave 4 data for Sept and October of 2023.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_working_year>> in place of Jan-April, <<dd_display: %4.0f $this_working_year+1>>.
 
 
 
 Here are trips, by fishing year:
 
 ~~~~
-<<dd_do:quietly>>
+<<dd_ignore>>
 use "${FY_dir}/FY_targeting.dta", replace
 /* 2018 has partial data in it (From April of 2019)*/
 drop if fishing_year<$last_year
 sort fishing_year
-expand 2 if fishing_year==${this_year}, gen(tag)
-replace dtrip=dtrip+`april' if fishing_year==${this_year} & tag==1
+expand 2 if fishing_year==${this_working_year}, gen(tag)
+replace dtrip=dtrip+`april' if fishing_year==${this_working_year} & tag==1
 tostring fishing_year, replace
-replace fishing_year=fishing_year+"Proj" if fishing_year=="${this_year}" & tag==1
-replace fishing_year=fishing_year+"Actual" if fishing_year=="${this_year}" & tag==0
+replace fishing_year=fishing_year+"Proj" if fishing_year=="${this_working_year}" & tag==1
+replace fishing_year=fishing_year+"Actual" if fishing_year=="${this_working_year}" & tag==0
 drop tag
 sort fishing_year
 
-<</dd_do>>
+<</dd_ignore>>
 
 <<dd_do>>
 list, abbreviate(16)
@@ -127,10 +127,10 @@ list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
-Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>. 
+Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_working_year>>. 
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common1'_landings_${this_year}.dta", replace
+use "${my_outputdir}/`my_common1'_landings_${this_working_year}.dta", replace
 sort year month 
 format tot_cat* a b1 b2 landings %10.0fc
 <</dd_do>>
@@ -156,6 +156,10 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
@@ -164,16 +168,16 @@ keep if year==$last_year
 
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count) 
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count) 
 <</dd_do>>
 ~~~~
 
 
 
-Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>. 
+Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_working_year>>. 
 ~~~~
 <<dd_do:quietly>>
-use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${this_year}.dta", clear
+use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${this_working_year}.dta", clear
 
 gen ab1_lbs_per_fish=ab1weight/ab1_count
 gen b2_lbs_per_fish=b2weight/b2_count
@@ -184,15 +188,19 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
 
-keep if year==$this_year
+keep if year==$this_working_year
 <</dd_do>>
 <<dd_do>>
 
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
@@ -215,10 +223,10 @@ list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
-Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  With the data update, there are both b1's and B2s in April.
+Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_working_year>>.  With the data update, there are both b1's and B2s in April.
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common2'_landings_${this_year}.dta", replace
+use "${my_outputdir}/`my_common2'_landings_${this_working_year}.dta", replace
 sort year month 
 format tot_cat* a b1 b2 landings* %10.0fc
 <</dd_do>>
@@ -244,6 +252,9 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
@@ -252,16 +263,16 @@ keep if year==$last_year
 <</dd_do>>
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
 
 
-Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>. With the data update, there are both b1's and B2s in April.  There are also measured B2 haddock from July-October now.  The weights per fish look reasonable.
+Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_working_year>>. With the data update, there are both b1's and B2s in April.  There are also measured B2 haddock from July-October now.  The weights per fish look reasonable.
 ~~~~
 <<dd_do:quietly>>
-use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_year}.dta", clear
+use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_working_year}.dta", clear
 
 gen ab1_lbs_per_fish=ab1weight/ab1_count
 gen b2_lbs_per_fish=b2weight/b2_count
@@ -272,14 +283,17 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
 
-keep if year==$this_year
+keep if year==$this_working_year
 <</dd_do>>
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
