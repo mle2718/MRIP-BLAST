@@ -281,7 +281,7 @@ foreach sp in atlanticcod haddock{
 
 
 
-/*stack these into a single dataset */
+/*stack the weighted B2s into a single dataset */
 clear
 local cod_wave_b2: dir "$my_outputdir" files "atlanticcodl_in_bin_b2*.dta"
 local haddock_wave_b2: dir "$my_outputdir" files "haddockl_in_bin_b2*.dta"
@@ -307,8 +307,6 @@ capture destring month, replace
 keep if year==$working_year
 
 save "$my_outputdir/haddock_b2_$working_year.dta", replace
-
-
 
 
 /* join the b2 length data with the total number of released to get the length distribution for the number of fish released */
