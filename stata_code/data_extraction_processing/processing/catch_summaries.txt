@@ -26,7 +26,7 @@ dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summarie
 Effort  statistics 
 ===============================================================
 
-We use Wave 1-5 data if it is available. Before Wave 5 data is available, we fill in with Wave 5 from the previous year.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_working_year>> in place of Jan-April, <<dd_display: %4.0f $this_working_year+1>>.
+We use Wave 1-5 data if it is available. Before Wave 5 data is available, we fill in with Wave 5 from the previous year.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this_working_year>>. And we will use Jan-April, <<dd_display: %4.0f $this_working_year>> in place of Jan-April, <<dd_display: %4.0f $this_working_year+1>>.
 
 BLAST inputs:
 
@@ -42,7 +42,7 @@ For cod, we use the survey weights for all catch and effort statistics *except* 
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2023_11_07
+global vintage_string 2023_11_08
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
@@ -118,6 +118,48 @@ list, abbreviate(16)
 <</dd_do>>
 ~~~~
 Data from FY <<dd_display: %4.0f $this_working_year>>.
+
+
+
+
+
+Trips by Mode  
+===============================================================
+
+The regulations for Haddock were different based on mode
+
+Haddock:
+
+*    For-Hire sector: 15 fish with an 18" minimum size.
+*    Private Anglers: 10 fish with a 17" minimum size.
+
+
+~~~~
+<<dd_do>>
+
+use "${my_outputdir}/`my_common1'_`my_common2'_target_mode_${two_years}.dta", clear
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_mode_${last_year}.dta"
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_mode_${this_working_year}.dta"
+destring month, replace
+
+
+qui summ month if year==$this_working_year
+local max=r(max)
+
+/* Use previous FY if I don't have wave 5 data yet. */
+if `max'<=8{
+expand 2 if year==${last_year} & month>`max', gen(tag)
+replace year=$this_working_year if tag==1 & month>`max'
+}
+sort year month mode
+
+
+list year month mode dtrip if mode=="Private", abbreviate(16) sepby(year)
+
+
+list year month mode dtrip if mode=="ForHire", abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
 
 
 Catch Statistics for Cod  
