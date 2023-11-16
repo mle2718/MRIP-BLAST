@@ -189,8 +189,8 @@ sort year month mode
 rename mode mode_disagg
 replace mode="Charter" if mode=="CH"
 replace mode="Head" if mode=="HE"
-replace mode=="Private" if mode=="PR"
-replace mode=="Shore" if mode=="PR"
+replace mode="Private" if mode=="PR"
+replace mode="Shore" if mode=="SH"
 
 di "Private"
 list year month mode dtrip if mode=="Private", abbreviate(16) sepby(year)
@@ -205,6 +205,28 @@ list year month mode dtrip if mode=="Charter", abbreviate(16) sepby(year)
 
 di "Shore"
 list year month mode dtrip if mode=="Shore", abbreviate(16) sepby(year)
+
+collapse (sum) dtrip, by(year mode)
+bysort year: egen t_trip=total(dtrip)
+gen pct=dtrip/t_trip * 100
+format pct %04.2fc
+
+sort year pct
+di "Total"
+list year mode dtrip pct , abbreviate(16) sepby(year)
+
+
+
+collapse (sum) dtrip, by(mode)
+egen t_trip=total(dtrip)
+gen pct=dtrip/t_trip * 100
+format pct %04.2fc
+
+sort pct
+di "Total"
+list mode dtrip pct , abbreviate(16)
+
+
 
 
 <</dd_do>>
