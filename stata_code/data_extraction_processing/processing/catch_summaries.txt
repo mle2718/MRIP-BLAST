@@ -162,6 +162,74 @@ list year month mode dtrip if mode=="ForHire", abbreviate(16) sepby(year)
 ~~~~
 
 
+
+
+
+Trips by Disaggregated Mode  
+===============================================================
+
+~~~~
+<<dd_do>>
+
+use "${my_outputdir}/`my_common1'_`my_common2'_target_disagg_mode_${two_years}.dta", clear
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_disagg_mode_${last_year}.dta"
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_disagg_mode_${this_working_year}.dta"
+destring month, replace
+
+
+qui summ month if year==$this_working_year
+local max=r(max)
+
+/* Use previous FY if I don't have wave 5 data yet. */
+if `max'<=8{
+expand 2 if year==${last_year} & month>`max', gen(tag)
+replace year=$this_working_year if tag==1 & month>`max'
+}
+sort year month mode
+rename mode mode_disagg
+replace mode="Charter" if mode=="CH"
+replace mode="Head" if mode=="HE"
+replace mode=="Private" if mode=="PR"
+replace mode=="Shore" if mode=="PR"
+
+di "Private"
+list year month mode dtrip if mode=="Private", abbreviate(16) sepby(year)
+
+di "Headboat"
+list year month mode dtrip if mode=="Head", abbreviate(16) sepby(year)
+
+
+
+di "Charter"
+list year month mode dtrip if mode=="Charter", abbreviate(16) sepby(year)
+
+di "Shore"
+list year month mode dtrip if mode=="Shore", abbreviate(16) sepby(year)
+
+
+<</dd_do>>
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Catch Statistics for Cod  
 ===============================================================
 
