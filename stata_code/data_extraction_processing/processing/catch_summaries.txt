@@ -69,6 +69,7 @@ Haddock Regulations
 ==============================================================
 
 
+The 2022 regulations rolled over until August 14, 2023.
 
 
 | Year  | Mode      | Bag      |  Size    | Season |
@@ -120,6 +121,7 @@ Cod:
 The recreational sub-ACL for GoM cod was <<dd_display: %8.0fc $cod_recACL2023>> mt for FY 2023. The recreational sub-ACL for GOM haddock was <<dd_display: %8.0fc $hadd_recACL2023>> mt.  Regulation changes from previous year in **bold**.
 
 
+The 2022 regulations rolled over until August 14, 2023.
 Haddock:
 
 *    For-Hire sector: **15** fish with an **18"** minimum size.
@@ -739,7 +741,7 @@ list year month  inches total landed pct_kept if inches>=15 & inches<=18, sepby(
 <</dd_do>>
 ~~~~
 
-Private size limit in FY 2023 is 17".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting in May, 2023 nothing under 17" should be retained.
+Private size limit after August 15, 2023 is 17".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting at that time, 2023 nothing under 17" should be retained.
 
 There were no B2's measured on Private boats, so I've set the length distribution of the Private B2's to empty. There were also no ab1's measured on Private boats in April.  
 
@@ -768,7 +770,7 @@ list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="Private"
 <</dd_do>>
 ~~~~
 
-For-Hire size limit in FY 2023 is 18".  MRIP data rounds down to the (a 17.9" fish is reported as 17").  Starting in May, 2023 nothing under 18" should be retained.
+For-Hire size limit after August 15, 2023 is 18".  MRIP data rounds down to the (a 17.9" fish is reported as 17").  Starting on August 15, 2023 nothing under 18" should be retained.
 ~~~~
 <<dd_do>>
 list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="ForHire", sepby(month)
