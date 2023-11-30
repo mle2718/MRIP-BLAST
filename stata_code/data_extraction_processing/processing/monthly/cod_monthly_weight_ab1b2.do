@@ -31,6 +31,9 @@ global codb=3.1625
 global cmtoinch= 0.39370787
 global kilotolb=2.20462262
 
+
+/* l_in_bin from MRIP is length of catch, rounded down to the nearest inch */
+
 drop if l_in_bin==0
 gen weight_per_fish= $kilotolb*$coda*((l_in_bin+.5)/$cmtoinch)^$codb
 
