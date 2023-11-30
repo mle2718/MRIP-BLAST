@@ -741,7 +741,7 @@ list year month  inches total landed pct_kept if inches>=15 & inches<=18, sepby(
 
 Private size limit in FY 2023 is 17".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting in May, 2023 nothing under 17" should be retained.
 
-There were no B2's measured on Private boats, so I've set the length distribution of the Private B2's to empty. 
+There were no B2's measured on Private boats, so I've set the length distribution of the Private B2's to empty. There were also no ab1's measured on Private boats in April.  
 
 
 <<dd_do:quietly>>
@@ -757,6 +757,8 @@ sort mode year month inches
 
 
 replace b2=. if mode=="Private"
+replace ab1=. if mode=="Private" & month==4
+
 format ab1  b2 %8.0fc
 <</dd_do>>
 
