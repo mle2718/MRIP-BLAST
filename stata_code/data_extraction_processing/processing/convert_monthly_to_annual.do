@@ -29,7 +29,9 @@ use ${stacked_month}/monthly_cod_catch_class.dta, replace
 
 
 
-keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+/*keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,9,10,11,12))*/
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12)) 
+
 replace fishing_year=`yr1'
 /* annual totals */
 collapse (sum) count, by(tot_cat fishing_year)
@@ -76,9 +78,8 @@ graph export "${my_images_vintage}/cod_catch_classPno0_ANNUAL`yr1'.tif", as(tif)
 /*Load in the stacked monthly catch class distributions*/
 use ${stacked_month}/monthly_haddock_catch_class.dta, replace
 
-
-
-keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+/*keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,9,10,11,12))*/
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12)) 
 replace fishing_year=`yr1'
 /* annual totals */
 collapse (sum) count, by(tot_cat fishing_year)
@@ -146,9 +147,9 @@ graph export "${my_images_vintage}/haddock_catch_classPno0_ANNUAL`yr1'.tif", as(
 
 /*read in the size class distributions. Keep just the relevant FY. Collapse*/
 use ${stacked_month}/monthly_cod_size_class.dta, replace
+/*keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,9,10,11,12))*/
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12)) 
 
-
-keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
 replace fishing_year=`yr1'
 collapse (sum) count, by(lngcat fishing_year)
 
@@ -184,11 +185,13 @@ graph export "${my_images_vintage}/cod_size_classP_ANNUAL`yr1'.tif", as(tif) rep
 use ${stacked_month}/monthly_cod_size_class.dta, replace
 
 
-keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+/*keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,9,10,11,12))*/
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12)) 
+
 replace fishing_year=`yr1'
 
 
-gen open=inlist(month,4,9,10)
+gen open=inlist(month,9,10)
 collapse (sum) count, by(lngcat fishing_year open)
 preserve
 keep if open==1
@@ -251,7 +254,8 @@ graph export "${my_images_vintage}/cod_size_classP_OPEN_SPLIT`yr1'.tif", as(tif)
 use ${stacked_month}/monthly_haddock_size_class.dta, replace
 
 
-keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
+/*keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,9,10,11,12))*/
+keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12)) 
 replace fishing_year=`yr1'
 
 collapse (sum) count, by(lngcat fishing_year)

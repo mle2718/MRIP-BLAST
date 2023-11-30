@@ -29,8 +29,9 @@ dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summarie
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2023_11_08
+global vintage_string 2023_12_18
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
+global mode_dir "${data_main}/MRIP_${vintage_string}/mode"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
 local my_common1 "atlanticcod"
@@ -746,9 +747,7 @@ There were no B2's measured on Private boats, so I've set the length distributio
 
 <<dd_do:quietly>>
 
-global mode_vintage 2023_11_30
 
-global mode_dir "${data_main}/MRIP_$mode_vintage/mode"
 
 use "${mode_dir}/haddock_size_mode_class_${working_year}.dta", clear
 keep if year==$working_year

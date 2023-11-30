@@ -14,7 +14,7 @@ do ${extraction_code}/copy_over_raw_mrip.do
 
 /* copying over partial years of data */
 global yearlist 2023(1)2023
-*global wavelist 1(1)5
-global wavelist 1(1)4
+global wavelist 1(1)5
+*global wavelist 1(1)4
 
 do ${extraction_code}/copy_over_raw_mrip.do
