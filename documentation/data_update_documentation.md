@@ -37,3 +37,21 @@ The code assumes that the units from the historical numbers-at-age are in 000s o
 
 1. Constructing the historical selectivity.
 2. Initial age structures.
+
+# Notes from 2023
+
+Normally, we do this:
+```
+svyset psu_id [pweight= wp_size], strata(var_id) singleunit(certainty)
+svy: tab l_in_bin my_dom_id_string, count
+
+```
+
+We do not use the survey weights to compute the length distribution of B2 cod.  This is consistent with the stock assessment.
+
+For B2 cod, we do this instead
+```
+svyset psu_id,  strata(var_id) singleunit(certainty)
+svy: tab l_in_bin my_dom_id_string, count
+
+```
