@@ -1,6 +1,9 @@
 <<dd_version: 2>>
 
-<!---Execute this with:
+<!---
+This is a stata dynamic document that summarizes the MRIP data for cod and haddock. I use this to support the BLAST model.
+
+Execute this with:
 
 do $MRIP_BLAST
 
@@ -22,22 +25,6 @@ dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summarie
  ---> 
 
 
-
-Effort  statistics 
-===============================================================
-
-We use Wave 1-5 data if it is available. Before Wave 5 data is available, we fill in with Wave 5 from the previous year.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this_working_year>>. And we will use Jan-April, <<dd_display: %4.0f $this_working_year>> in place of Jan-April, <<dd_display: %4.0f $this_working_year+1>>.
-
-BLAST inputs:
-
-1.  Annual Length-frequency for cod and haddock. 
-2.  Monthly Catch-per-trip for cod and haddock. 
-3.  Total trips.  We will use FY 2023 data, but use Waves 1 and 2 from 2023  in place of the Waves 1 and 2 of 2024 (as usual). There's no trips in Wave 6.
-
-For haddock, we use the survey weights to compute all catch and effort statistics (lengths and counts for a, b1, and b2).
-
-For cod, we use the survey weights for all catch and effort statistics *except* one.  We use unweighted data to compute the length distribution of the B2s.
-
 ~~~~
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
@@ -52,10 +39,124 @@ local my_common2 "haddock"
 /*global this_working_year = 2023 */
 global last_year = $this_working_year - 1
 global two_years = $this_working_year - 2  
+
+/****************************/
+/****************************/
+/* Haddock and Cod rec ACLs in mt*/
+/****************************/
+/****************************/
+
+global haddock_mort2022=666
+
+global hadd_recACL2022=3634
+global cod_recACL2022=192
+
+
+global hadd_recACL2023=610
+global cod_recACL2023=192
+
+
+global mrip_vintage "2023_11_08"
+
+global hadd_recACL2024=0
+global cod_recACL2024=0
+
 <</dd_do>>
 ~~~~
 
-Here are monthly number of trips in Calendar Years <<dd_display: %4.0f $two_years >> through  <<dd_display: %4.0f $this_working_year>>
+<!----
+Haddock Regulations
+==============================================================
+
+
+
+
+| Year  | Mode      | Bag      |  Size    | Season |
+| :---- | -------: | -------:  | -------: |  -----------------: | 
+| 2021  | All | 15 | 17 inches | May 1-Feb 28, April 1-April 30 | 
+| 2022  | All | 20 | 17 inches | May 1-Feb 28, April 1-April 30 | 
+| 2023  | Private | 10 | 17 inches | May 1-Feb 28, April 1-April 30 | 
+| 2023  | For-Hire | 15 | 18 inches | May 1-Feb 28, April 1-April 30 | 
+
+ ---> 
+
+
+
+
+2021 Regulations 
+==============================================================
+
+Haddock:
+
+*    15 fish, 17"
+*    Open May1-Feb 28 and April 1- April 30
+
+Cod: 
+
+*   1 fish, 21"
+*   Open Sept 15-Sept 30 and April 1-April 14 for private anglers
+*   Open Sept 8-October 7 and April 1-April 14 for the for-hire anglers
+
+2022 Regulations
+==============================================================
+The recreational sub-ACL for GoM cod was <<dd_display: %8.0fc $cod_recACL2022>> mt for FY 2022. The recreational sub-ACL for GOM haddock was <<dd_display: %8.0fc $hadd_recACL2022>> mt. Regulation changes from previous year in **bold**.
+
+Haddock:
+
+*    **20 fish**, 17"
+*    Open May1-Feb 28 and April 1- April 30
+
+
+Cod: 
+
+*   1 fish, **22"**
+*   Open Sept 1-October 7 and April 1-April 14 for private anglers
+*   Open Sept 1-October 7 and April 1-April 14 for the for-hire anglers
+
+
+
+2023 Regulations
+==============================================================
+The recreational sub-ACL for GoM cod was <<dd_display: %8.0fc $cod_recACL2023>> mt for FY 2023. The recreational sub-ACL for GOM haddock was <<dd_display: %8.0fc $hadd_recACL2023>> mt.  Regulation changes from previous year in **bold**.
+
+
+Haddock:
+
+*    For-Hire sector: **15** fish with an **18"** minimum size.
+*    Private Anglers: **10** fish with a 17" minimum size.
+*    Open May1-Feb 28 and April 1- April 30. Closed for the month of March.
+
+Cod: 
+
+*   1 fish, 22"
+*   Open Sept 1- **October 31** for all anglers.
+
+
+We should expect to see fewer trips in April 2024 compared to 2023 (cod not open).  The May through August of 2023 should be roughly comparable to the 2022 time period, decreases in haddock regulations should reduce trips a bit.  We expect to see more trips in October 2023 compared to October 2022 because cod is open for the entire month, instead of just for a week.
+
+Calibrating the model is tricky. I should run 1 set of models for the For-Hire sector and another set for the Private sector. I need to cross this with a set of models that is open for april and a set of models that is closed for April. An easier thing to do is just to match the April of 2023 trips and then double the number of choice occasions. 
+
+
+
+
+Effort  statistics 
+===============================================================
+
+We use data from Waves 1-4 (January-October).  Wave 5 data is not available until mid December. We fill in with Wave 5 from the previous year, just for prototyping purposes.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this_working_year>>. And we will use Jan-April, <<dd_display: %4.0f $this_working_year>> in place of Jan-April, <<dd_display: %4.0f $this_working_year+1>>.
+
+BLAST inputs:
+
+1.  Monthly Length-frequency for cod and haddock. 
+2.  Monthly Catch-per-trip for cod and haddock. 
+3.  Total trips. 
+
+For haddock, we use the survey weights to compute all catch and effort statistics (lengths and counts for a, b1, and b2).
+
+For cod, we use the survey weights for all catch and effort statistics *except* one.  We use unweighted data to compute the length distribution of the B2s. This is consistent with how the stock assessment is done.
+
+
+
+Here are monthly number of trips in Calendar Years <<dd_display: %4.0f $two_years >> through  <<dd_display: %4.0f $this_working_year>>.  Prior to mid-December, we fill in with Wave 5 from the previous year.
 
 ~~~~
 <<dd_do>>
@@ -117,16 +218,13 @@ collapse (sum) dtrip, by(fishing_year)
 list, abbreviate(16)
 <</dd_do>>
 ~~~~
-Data from FY <<dd_display: %4.0f $this_working_year>>.
-
-
 
 
 
 Trips by Mode  
 ===============================================================
 
-The regulations for Haddock were different based on mode
+In FY 2023, the regulations for Haddock were different based on mode
 
 Haddock:
 
@@ -168,6 +266,9 @@ list year month mode dtrip if mode=="ForHire", abbreviate(16) sepby(year)
 Trips by Disaggregated Mode  
 ===============================================================
 
+All Private and Shore trips are "Private". All Party and Charter are ForHire. Costs are different for each, so I need to disaggregate further.
+
+
 ~~~~
 <<dd_do>>
 
@@ -191,65 +292,69 @@ replace mode="Charter" if mode=="CH"
 replace mode="Head" if mode=="HE"
 replace mode="Private" if mode=="PR"
 replace mode="Shore" if mode=="SH"
+<</dd_do>>
+~~~~
 
-di "Private"
+Monthly Trips for Private Vessels
+~~~~
+<<dd_do>>
 list year month mode dtrip if mode=="Private", abbreviate(16) sepby(year)
-
-di "Headboat"
-list year month mode dtrip if mode=="Head", abbreviate(16) sepby(year)
-
+<</dd_do>>
+~~~~
 
 
-di "Charter"
-list year month mode dtrip if mode=="Charter", abbreviate(16) sepby(year)
-
-di "Shore"
+Monthly Trips for Shore
+~~~~
+<<dd_do>>
 list year month mode dtrip if mode=="Shore", abbreviate(16) sepby(year)
-
-collapse (sum) dtrip, by(year mode)
-bysort year: egen t_trip=total(dtrip)
-gen pct=dtrip/t_trip * 100
-format pct %04.2fc
-
-sort year pct
-di "Total"
-list year mode dtrip pct , abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
 
 
-
-collapse (sum) dtrip, by(mode)
-egen t_trip=total(dtrip)
-gen pct=dtrip/t_trip * 100
-format pct %04.2fc
-
-sort pct
-di "Total"
-list mode dtrip pct , abbreviate(16)
+Monthly Trips for Headboats
+~~~~
+<<dd_do>>
+list year month mode dtrip if mode=="Head", abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
 
 
-
-
+Monthly Trips for Charters
+~~~~
+<<dd_do>>
+list year month mode dtrip if mode=="Charter", abbreviate(16) sepby(year)
 <</dd_do>>
 ~~~~
 
 
 
 
+All Trips by year
+~~~~
+<<dd_do>>
+collapse (sum) dtrip, by(year mode)
+bysort year: egen t_trip=total(dtrip)
+gen pct=dtrip/t_trip * 100
+format pct %04.2fc
 
+gsort year - pct  
+list year mode dtrip pct , abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
 
+All Trips, 2022 and 2023
+~~~~
+<<dd_do>>
+keep if inlist(year,2022, 2023)
+collapse (sum) dtrip, by(mode)
+egen t_trip=total(dtrip)
+gen pct=dtrip/t_trip * 100
+format pct %04.2fc
 
-
-
-
-
-
-
-
-
-
-
-
-
+gsort - pct 
+list mode dtrip pct , abbreviate(16)
+<</dd_do>>
+~~~~
 
 
 Catch Statistics for Cod  
@@ -600,6 +705,73 @@ list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_
 ~~~~
 
 
+Length distributions for haddock landed. Just the Fish in the 15-19" range. There were no B2's measured on Private boats, so this assumes the B2's on private boats is similar to the B2s on ForHire and Charter vessels.
+
+
+
+<<dd_do:quietly>>
+
+use "${data_main}/MRIP_${vintage_string}/monthly/haddock_ab1_counts_${this_working_year}.dta", clear
+
+
+merge 1:1 year month l_in_bin using "${data_main}/MRIP_${vintage_string}/monthly/haddock_b2_counts_${this_working_year}.dta"
+drop _merge
+
+
+replace ab1_count=0 if ab1_count==.
+replace b2_count=0 if b2_count==.
+
+drop b2_UWcount
+
+gen total=ab1_count+b2_count
+gen pct_kept=ab1_count/total*100
+
+format ab1 b2 total %8.0fc
+
+format pct_kept %4.1fc
+rename l_in_bin inches
+rename ab1 landed
+<</dd_do>>
+
+~~~~
+<<dd_do>>
+list year month  inches total landed pct_kept if inches>=15 & inches<=18, sepby(month)
+<</dd_do>>
+~~~~
+
+Private size limit in FY 2023 is 17".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting in May, 2023 nothing under 17" should be retained.
+
+There were no B2's measured on Private boats, so I've set the length distribution of the Private B2's to empty. 
+
+
+<<dd_do:quietly>>
+
+global mode_vintage 2023_11_30
+
+global mode_dir "${data_main}/MRIP_$mode_vintage/mode"
+
+use "${mode_dir}/haddock_size_mode_class_${working_year}.dta", clear
+keep if year==$working_year
+rename lngcat inches
+sort mode year month inches
+
+
+replace b2=. if mode=="Private"
+format ab1  b2 %8.0fc
+<</dd_do>>
+
+~~~~
+<<dd_do>>
+list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="Private", sepby(month)
+<</dd_do>>
+~~~~
+
+For-Hire size limit in FY 2023 is 18".  MRIP data rounds down to the (a 17.9" fish is reported as 17").  Starting in May, 2023 nothing under 18" should be retained.
+~~~~
+<<dd_do>>
+list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="ForHire", sepby(month)
+<</dd_do>>
+~~~~
 
 
 
