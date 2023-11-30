@@ -148,12 +148,14 @@ rename  site_id intsite
 drop if _merge==2
 drop _merge
 
-/*classify into GOM or GBS */
-gen str3 area_s="AAA"
 
-replace area_s="GOM" if st==23 | st==33
-replace area_s="GOM" if st==25 & strmatch(stock_region_calc,"NORTH")
-replace area_s="GBS" if st==25 & strmatch(stock_region_calc,"SOUTH")
+
+/*classify into (O)ther, Gulf of (M)aine, or Georges (B)ank */
+gen str3 area_s="O"
+
+replace area_s="M" if st==23 | st==33
+replace area_s="M" if st==25 & strmatch(stock_region_calc,"NORTH")
+replace area_s="B" if st==25 & strmatch(stock_region_calc,"SOUTH")
 
 destring mode_fx, replace
 gen str mode="F" if inlist(mode_fx,4,5)
@@ -228,7 +230,7 @@ foreach j of numlist 1/`i'{
 	svmat sub`j', names(col)
 
 }
-keep if strmatch(area_s,"GOM")==1
+keep if strmatch(area_s,"M")==1
 keep if strmatch(dom_id,"1")==1
 format dtrip %10.0fc
 decode my_dom_id, gen(my_dom_id_string)
