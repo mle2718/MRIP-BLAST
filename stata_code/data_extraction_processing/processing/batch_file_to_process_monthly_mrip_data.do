@@ -330,11 +330,11 @@ do "${processing_code}/monthly/cod_haddock_directed_trips_by_month.do"
 
 
 
-do "${processing_code}/monthly/cod_haddock_directed_trips_by_month_mode.do"
+do "${processing_code}/mode/cod_haddock_directed_trips_by_month_mode.do"
 
 
 
-do "${processing_code}/monthly/cod_haddock_directed_trips_by_month_disagg_mode.do"
+do "${processing_code}/mode/cod_haddock_directed_trips_by_month_disagg_mode.do"
 
 
 
