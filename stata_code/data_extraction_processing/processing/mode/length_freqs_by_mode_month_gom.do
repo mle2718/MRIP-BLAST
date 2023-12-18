@@ -1,4 +1,4 @@
-/* This is a file that produces a dataset that contains #of fish encountered per trip.
+ /* This is a file that produces a dataset that contains #of fish encountered per trip.
 This is a port of Scott's "cod_domain_length_freqs_by_wave_gom_2013.sas"
 
 This is a template program for estimating length frequencies
@@ -17,7 +17,7 @@ Required input datasets:
 It looks like we also need to port cod_domain_length_freqs_b2_by_wave_gom_2013 as well 
 
 There will be one output per variable and year in working directory:
-"$my_common`myv'_b2$working_year.dta"
+"$my_common`myv'_a1b1$working_year.dta"
 
 
 
@@ -28,10 +28,8 @@ COMPUTE totals and std deviations for cod catch
 
  */
  clear
+
  mata: mata clear
-
-
-
 
 tempfile tl1 sl1
 
@@ -39,6 +37,8 @@ foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
 cap drop $drop_conditional
+
+
 
 replace var_id=strat_id if strmatch(var_id,"")
 sort year strat_id psu_id id_code
@@ -63,9 +63,8 @@ sort year strat_id psu_id id_code
 save `tl1'
 clear
 
-
-
-foreach file in $b2list{
+ 
+foreach file in $sizelist{
 	append using ${data_raw}/`file'
 }
 cap drop $drop_conditional
@@ -97,6 +96,8 @@ cap drop $drop_conditional
 }
 
 sort year strat_id psu_id id_code
+replace var_id=strat_id if strmatch(var_id,"")
+
 replace common=subinstr(lower(common)," ","",.)
 save `sl1'
 
@@ -125,12 +126,21 @@ rename  site_id intsite
 drop if _merge==2
 drop _merge
 
-/*classify into GOM or GBS */
-gen str3 area_s="OTH"
 
-replace area_s="GOM" if st==23 | st==33
-replace area_s="GOM" if st==25 & strmatch(stock_region_calc,"NORTH")
-replace area_s="GBS" if st==25 & strmatch(stock_region_calc,"SOUTH")
+
+/*classify into (O)ther, Gulf of (M)aine, or Georges (B)ank */
+gen str3 area_s="O"
+
+replace area_s="M" if st==23 | st==33
+replace area_s="M" if st==25 & strmatch(stock_region_calc,"NORTH")
+replace area_s="B" if st==25 & strmatch(stock_region_calc,"SOUTH")
+
+
+destring mode_fx, replace
+gen str mode="F" if inlist(mode_fx,4,5)
+replace mode="P" if mode==""
+
+
 
  /* classify catch into the things I care about (common==$mycommon) and things I don't care about "ZZZZZZZZ" use the id_code*/
  gen common_dom="zzzzzz"
@@ -143,8 +153,6 @@ if strmatch("$my_common","atlanticcod")==1{
  }
 
  
-
- 
 tostring wave, gen(w2)
 tostring year, gen(year2)
 
@@ -153,7 +161,7 @@ drop month
 tostring mymo, gen(month)
 drop mymo
 
-gen my_dom_id_string=area_s+"_"+month+"_"+common_dom
+gen my_dom_id_string=area_s+"_"+mode + "_"+month+"_"+common_dom
 
 replace my_dom_id_string=subinstr(ltrim(rtrim(my_dom_id_string))," ","",.)
 encode my_dom_id_string, gen(my_dom_id)
@@ -165,10 +173,17 @@ gen l_in_bin=floor(lngth*0.03937) */
 replace l_in_bin=0 if strmatch(common_dom, "$my_common")==0
 
 
-sort year w2 strat_id psu_id id_code
 
-preserve
 
+
+
+
+
+
+
+
+
+sort year2 area_s w2 strat_id psu_id id_code common_dom
 svyset psu_id [pweight= wp_size], strata(var_id) singleunit(certainty)
 
  
@@ -198,7 +213,7 @@ local myv l_in_bin
 	
 
 	
-	keep `myv' GOM*
+	keep `myv' M*
 	drop *_z*
 	gen year=$working_year
 	
@@ -206,20 +221,22 @@ local myv l_in_bin
 	*if there are GOM variables, then do some stuff there will be GOM _species variables if qui desc produces r(k) >=2
 	qui desc
 	if r(k)>=3{
-	foreach var of varlist GOM*{
+	foreach var of varlist M*{
 	tokenize `var', parse("_")
-	rename `var' `1'`3'
+	rename `var' `1'`3'`5'
 	}
 	
 	
-	reshape long GOM, i(l_in_bin) j(month)
-	rename GOM count
+	
+	reshape long MF MP, i(l_in_bin year ) j(month)
+	rename MF count_ForHire 
+	rename MP count_Private
 	}
 	else{
 	keep year
 	expand 12
 	gen month=_n
-	duplicates drop
+	duplicates drop 
 	drop _expand
 	gen l_in_bin=0
 	gen count=0
@@ -230,85 +247,12 @@ local myv l_in_bin
 	
 	sort year month l_in_bin
 	order year month l_in_bin
-	keep if year==${working_year}
-	tempfile b2W
-	save `b2W', replace
 	
+	
+		
+	save "$my_outputdir/$my_common`myv'_mode_a1b1_${working_year}.dta", replace
 
-restore
-
-/*this overkill, because I believe I just have to 
-tab `myv' my_dom_id_string, count
-but then I'd have to rewrite some 
-*/
-svyset psu_id, strata(var_id) singleunit(certainty)
-
- 
-local myv l_in_bin
-
-	svy: tab `myv' my_dom_id_string, count
-	/*save some stuff  
-	matrix of proportions, row names, column names, estimate of total population size*/
-	mat eP=e(Prop)
-	mat eR=e(Row)'
-	mat eC=e(Col)
-	local PopN=e(N_pop)
-
-	local mycolnames: colnames(eC)
-	mat colnames eP=`mycolnames'
-	
-	clear
-	/*read the eP into a dataset and convert proportion of population into numbers*/
-	svmat eP, names(col)
-	foreach var of varlist *{
-		replace `var'=`var'*`PopN'
-	}
-	/*read in the "row" */
-	svmat eR
-	order eR
-	rename eR `myv'
-	
-
-	
-	keep `myv' GOM*
-	drop *_z*
-	gen year=$working_year
-	
-	
-	*if there are GOM variables, then do some stuff there will be GOM _species variables if qui desc produces r(k) >=2
-	qui desc
-	if r(k)>=3{
-	foreach var of varlist GOM*{
-	tokenize `var', parse("_")
-	rename `var' `1'`3'
-	}
-	
-	
-	reshape long GOM, i(l_in_bin) j(month)
-	rename GOM count_UW
-	}
-	else{
-	keep year
-	expand 12
-	gen month=_n
-	duplicates drop
-	drop _expand
-	gen l_in_bin=0
-	gen count=0
-	}
-	
-	
-	
-	
-	sort year month l_in_bin
-	order year month l_in_bin
-	keep if year==${working_year}
-	
-	merge 1:1 year month l_in_bin using `b2W'
-	assert _merge==3
-	drop _merge
-	save "$my_outputdir/$my_common`myv'_b2_${working_year}.dta", replace
-
+clear
 
 
 

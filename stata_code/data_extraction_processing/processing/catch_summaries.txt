@@ -1,12 +1,15 @@
 <<dd_version: 2>>
 
-<!---Execute this with:
+<!---
+This is a stata dynamic document that summarizes the MRIP data for cod and haddock. I use this to support the BLAST model.
+
+Execute this with:
 
 do $MRIP_BLAST
 
 
 if strmatch("$user","minyangWin"){
-	global project_dir  "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-MRIP-BLAST/" 
+	global project_dir  "V:/READ-SSB-Lee-MRIP-BLAST/" 
 }
 
 
@@ -14,123 +17,399 @@ if strmatch("$user","minyangWin"){
 global code_dir "${project_dir}/stata_code"
 global working_data "${project_dir}/working_data"
 global output_dir "${project_dir}/output"
-
+global this_working_year 2023
+global last_year = $this_working_year - 1
+global two_years = $this_working_year - 2  
 dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
 
  ---> 
-
-
-
-Effort  statistics 
-===============================================================
-
-
-BLAST inputs:
-
-1.  Annual Length-frequency for cod and haddock. 
-2.  Monthly Catch-per-trip for cod and haddock. 
-3.  Total trips.  We will use FY 2022 data, but use Waves 1 and 2 from 2022  in place of the Waves 1 and 2 of 2023 (as usual). There's no trips in Wave 6.
-
 
 
 ~~~~
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2023_01_04
+global vintage_string 2023_12_18
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
 local my_common1 "atlanticcod"
 local my_common2 "haddock"
 
-global this_year = 2022
-global last_year = $this_year-1
+/*global this_working_year = 2023 */
+global last_year = $this_working_year - 1
+global two_years = $this_working_year - 2  
+
+/****************************/
+/****************************/
+/* Haddock and Cod rec ACLs in mt*/
+/****************************/
+/****************************/
+
+global haddock_mort2022=666
+
+global hadd_recACL2022=3634
+global cod_recACL2022=192
+
+
+global hadd_recACL2023=610
+global cod_recACL2023=192
+
+
+global mrip_vintage "2023_12_18"
+
+global hadd_recACL2024=759
+global cod_recACL2024=192
+
 <</dd_do>>
 ~~~~
 
-Here are monthly number of trips in Calendar Year <<dd_display: %4.0f $last_year>>. 
+<!----
+Haddock Regulations
+==============================================================
 
 
+The 2022 regulations rolled over until August 14, 2023.
+
+
+| Year  | Mode      | Bag      |  Size    | Season |
+| :---- | -------: | -------:  | -------: |  -----------------: | 
+| 2021  | All | 15 | 17 inches | May 1-Feb 28, April 1-April 30 | 
+| 2022  | All | 20 | 17 inches | May 1-Feb 28, April 1-April 30 | 
+| 2023  | Private | 10 | 17 inches | May 1-Feb 28, April 1-April 30 | 
+| 2023  | For-Hire | 15 | 18 inches | May 1-Feb 28, April 1-April 30 | 
+
+ ---> 
+
+
+
+
+2021 Regulations 
+==============================================================
+
+Haddock:
+
+*    15 fish, 17"
+*    Open May1-Feb 28 and April 1- April 30
+
+Cod: 
+
+*   1 fish, 21"
+*   Open Sept 15-Sept 30 and April 1-April 14 for private anglers
+*   Open Sept 8-October 7 and April 1-April 14 for the for-hire anglers
+
+2022 Regulations
+==============================================================
+The recreational sub-ACL for GoM cod was <<dd_display: %8.0fc $cod_recACL2022>> mt for FY 2022. The recreational sub-ACL for GOM haddock was <<dd_display: %8.0fc $hadd_recACL2022>> mt. Regulation changes from previous year in **bold**.
+
+Haddock:
+
+*    **20 fish**, 17"
+*    Open May1-Feb 28 and April 1- April 30
+
+
+Cod: 
+
+*   1 fish, **22"**
+*   Open Sept 1-October 7 and April 1-April 14 for private anglers
+*   Open Sept 1-October 7 and April 1-April 14 for the for-hire anglers
+
+
+
+2023 Regulations
+==============================================================
+The recreational sub-ACL for GoM cod was <<dd_display: %8.0fc $cod_recACL2023>> mt for FY 2023. The recreational sub-ACL for GOM haddock was <<dd_display: %8.0fc $hadd_recACL2023>> mt.  Regulation changes from previous year in **bold**.
+
+
+The 2022 regulations rolled over until August 14, 2023.
+Haddock:
+
+*    For-Hire sector: **15** fish with an **18"** minimum size.
+*    Private Anglers: **10** fish with a 17" minimum size.
+*    Open May1-Feb 28 and April 1- April 30. Closed for the month of March.
+
+Cod: 
+
+*   1 fish, 22"
+*   Open Sept 1- **October 31** for all anglers.
+
+
+We should expect to see fewer trips in April 2024 compared to 2023 (cod not open).  The May through August of 2023 should be roughly comparable to the 2022 time period, decreases in haddock regulations should reduce trips a bit.  We expect to see more trips in October 2023 compared to October 2022 because cod is open for the entire month, instead of just for a week.
+
+Calibrating the model is tricky. I should run 1 set of models for the For-Hire sector and another set for the Private sector. I need to cross this with a set of models that is open for april and a set of models that is closed for April. An easier thing to do is just to match the April of 2023 trips and then double the number of choice occasions. 
+
+
+
+
+Effort  statistics 
+===============================================================
+
+We use data from Waves 1-4 (January-October).  Wave 5 data is not available until mid December. We fill in with Wave 5 from the previous year, just for prototyping purposes.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this_working_year>>. And we will use Jan-April, <<dd_display: %4.0f $this_working_year>> in place of Jan-April, <<dd_display: %4.0f $this_working_year+1>>.
+
+BLAST inputs:
+
+1.  Monthly Length-frequency for cod and haddock. 
+2.  Monthly Catch-per-trip for cod and haddock. 
+3.  Total trips. 
+
+For haddock, we use the survey weights to compute all catch and effort statistics (lengths and counts for a, b1, and b2).
+
+For cod, we use the survey weights for all catch and effort statistics *except* one.  We use unweighted data to compute the length distribution of the B2s. This is consistent with how the stock assessment is done.
+
+
+
+Here are monthly number of trips in Calendar Years <<dd_display: %4.0f $two_years >> through  <<dd_display: %4.0f $this_working_year>>.  Prior to mid-December, we fill in with Wave 5 from the previous year.
 
 ~~~~
-<<dd_do:quietly>>
-use "${my_outputdir}/`my_common1'_`my_common2'_target_${last_year}.dta", replace
+<<dd_do>>
+
+
+use "${my_outputdir}/`my_common1'_`my_common2'_target_${two_years}.dta", clear
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_${last_year}.dta"
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_${this_working_year}.dta"
+destring month, replace
+
+
+qui summ month if year==$this_working_year
+local max=r(max)
+
+/* Use previous FY if I don't have wave 5 data yet. */
+if `max'<=8{
+expand 2 if year==${last_year} & month>`max', gen(tag)
+replace year=$this_working_year if tag==1 & month>`max'
+}
 sort year month 
-<</dd_do>>
-
-<<dd_do>>
-list year month dtrip, abbreviate(16)
-<</dd_do>>
-~~~~
 
 
-And here are monthly number trips for <<dd_display: %4.0f $this_year>>.  
-~~~~
-<<dd_do:quietly>>
-use "${my_outputdir}/`my_common1'_`my_common2'_target_${this_year}.dta", replace
-sort year month
-local april=dtrip[1] 
-<</dd_do>>
-
-<<dd_do>>
-list year month dtrip, abbreviate(16)
+list year month dtrip, abbreviate(16) sepby(year)
 <</dd_do>>
 ~~~~
 
-Data was processed on <<dd_display: c(current_date)>>. 
 
-I am using preliminary Wave 5 data for Sept and October of 2022.  As always, we use November and December of <<dd_display: %4.0f $last_year>> in place of November and December of <<dd_display: %4.0f $this year>>. And we will use Jan-April, <<dd_display: %4.0f $this_year>> in place of Jan-April, <<dd_display: %4.0f $this_year+1>>.
-
+Data was processed on <<dd_display: "$vintage_string">>. 
 
 
 Here are trips, by fishing year:
 
 ~~~~
-<<dd_do:quietly>>
-use "${FY_dir}/FY_targeting.dta", replace
-/* 2018 has partial data in it (From April of 2019)*/
-drop if fishing_year<$last_year
-sort fishing_year
-expand 2 if fishing_year==${this_year}, gen(tag)
-replace dtrip=dtrip+`april' if fishing_year==${this_year} & tag==1
-tostring fishing_year, replace
-replace fishing_year=fishing_year+"Proj" if fishing_year=="${this_year}" & tag==1
-replace fishing_year=fishing_year+"Actual" if fishing_year=="${this_year}" & tag==0
-drop tag
-sort fishing_year
-
-<</dd_do>>
-
 <<dd_do>>
+
+qui summ month if year==$this_working_year
+local max=r(max)
+
+/* Use previous FY if I don't have wave 5 data yet. */
+if `max'<=8{
+expand 2 if year==${last_year} & month>`max', gen(tag)
+replace year=$this_working_year if tag==1 & month>`max'
+}
+
+cap drop tag
+gen fishing_year=year
+replace fishing_year=fishing_year-1 if month<=4
+/* fillin waves 6, 1 and 2. for the most recent FY.*/
+
+expand 2 if fishing_year==$last_year & inlist(month,1,2,3,4,11,12), gen(tag)
+replace fishing_year=$this_working_year if tag==1 
+replace year=$this_working_year+1 if tag==1 
+drop tag
+
+drop if fishing_year<$two_years 
+sort fishing_year
+collapse (sum) dtrip, by(fishing_year)
+
 list, abbreviate(16)
 <</dd_do>>
 ~~~~
-FY 2022 data is partial
+
+
+
+Trips by Mode  
+===============================================================
+
+In FY 2023, the regulations for Haddock were different based on mode
+
+Haddock:
+
+*    For-Hire sector: 15 fish with an 18" minimum size.
+*    Private Anglers: 10 fish with a 17" minimum size.
+
+
+~~~~
+<<dd_do>>
+
+use "${my_outputdir}/`my_common1'_`my_common2'_target_mode_${two_years}.dta", clear
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_mode_${last_year}.dta"
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_mode_${this_working_year}.dta"
+destring month, replace
+
+
+qui summ month if year==$this_working_year
+local max=r(max)
+
+/* Use previous FY if I don't have wave 5 data yet. */
+if `max'<=8{
+expand 2 if year==${last_year} & month>`max', gen(tag)
+replace year=$this_working_year if tag==1 & month>`max'
+}
+sort year month mode
+
+
+list year month mode dtrip if mode=="Private", abbreviate(16) sepby(year)
+
+
+list year month mode dtrip if mode=="ForHire", abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
+
+
+
+
+
+Trips by Disaggregated Mode  
+===============================================================
+
+All Private and Shore trips are "Private". All Party and Charter are ForHire. Costs are different for each, so I need to disaggregate further.
+
+
+~~~~
+<<dd_do>>
+
+use "${my_outputdir}/`my_common1'_`my_common2'_target_disagg_mode_${two_years}.dta", clear
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_disagg_mode_${last_year}.dta"
+append using "${my_outputdir}/`my_common1'_`my_common2'_target_disagg_mode_${this_working_year}.dta"
+destring month, replace
+
+
+qui summ month if year==$this_working_year
+local max=r(max)
+
+/* Use previous FY if I don't have wave 5 data yet. */
+if `max'<=8{
+expand 2 if year==${last_year} & month>`max', gen(tag)
+replace year=$this_working_year if tag==1 & month>`max'
+}
+sort year month mode
+rename mode mode_disagg
+replace mode="Charter" if mode=="CH"
+replace mode="Head" if mode=="HE"
+replace mode="Private" if mode=="PR"
+replace mode="Shore" if mode=="SH"
+<</dd_do>>
+~~~~
+
+Monthly Trips for Private Vessels
+~~~~
+<<dd_do>>
+list year month mode dtrip if mode=="Private", abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
+
+
+Monthly Trips for Shore
+~~~~
+<<dd_do>>
+list year month mode dtrip if mode=="Shore", abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
+
+
+Monthly Trips for Headboats
+~~~~
+<<dd_do>>
+list year month mode dtrip if mode=="Head", abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
+
+
+Monthly Trips for Charters
+~~~~
+<<dd_do>>
+list year month mode dtrip if mode=="Charter", abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
+
+
+
+
+All Trips by year
+~~~~
+<<dd_do>>
+collapse (sum) dtrip, by(year mode)
+bysort year: egen t_trip=total(dtrip)
+gen pct=dtrip/t_trip * 100
+format pct %04.2fc
+
+gsort year - pct  
+list year mode dtrip pct , abbreviate(16) sepby(year)
+<</dd_do>>
+~~~~
+
+All Trips, 2022 and 2023
+~~~~
+<<dd_do>>
+keep if inlist(year,2022, 2023)
+collapse (sum) dtrip, by(mode)
+egen t_trip=total(dtrip)
+gen pct=dtrip/t_trip * 100
+format pct %04.2fc
+
+gsort - pct 
+list mode dtrip pct , abbreviate(16)
+<</dd_do>>
+~~~~
 
 
 Catch Statistics for Cod  
 ===============================================================
 
 
-Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $last_year>>.  
+Here are the cod (a, b1, b2) in numbers for Calendar Years <<dd_display: %4.0f $two_year>> to <<dd_display: %4.0f $this_working_year>>.  
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common1'_landings_${last_year}.dta", replace
+clear
+use "${my_outputdir}/`my_common1'_landings_${two_years}.dta"
+
 sort year month 
 format tot_cat* a b1 b2 landings* %10.0fc
 <</dd_do>>
 
 <<dd_do>>
-list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
+list, abbreviate(16)  sum(tot_cat* a b1 b2 landings*) sepby(year)
+<</dd_do>>
+
+<<dd_do:quietly>>
+clear
+use "${my_outputdir}/`my_common1'_landings_${last_year}.dta"
+sort year month 
+format tot_cat* a b1 b2 landings* %10.0fc
+<</dd_do>>
+
+<<dd_do>>
+list, abbreviate(16)  sum(tot_cat* a b1 b2 landings*) sepby(year)
 <</dd_do>>
 ~~~~
 
-Here are the cod (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>. 
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common1'_landings_${this_year}.dta", replace
-sort year month 
+use "${my_outputdir}/`my_common1'_landings_${this_working_year}.dta", replace
+
+
+qui summ month
+local max=r(max)
+
+if `max'<=9{
+preserve
+use "${my_outputdir}/`my_common1'_landings_${last_year}.dta", clear
+keep if month>`max'
+replace year=${this_working_year}
+tempfile appender
+save `appender'
+restore
+append using `appender'
+}
+sort year month
+
+
 format tot_cat* a b1 b2 landings %10.0fc
 <</dd_do>>
 
@@ -141,7 +420,39 @@ list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 
 
 
-Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year<<dd_display: %4.0f $last_year>>. 
+Here are the cod (a, b1, b2) in weights for Calendar Years <<dd_display: %4.0f $two_years>> to <<dd_display: %4.0f $this_working_year>>.  
+
+
+~~~~
+<<dd_do:quietly>>
+use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${two_years}.dta", clear
+
+gen ab1_lbs_per_fish=ab1weight/ab1_count
+gen b2_lbs_per_fish=b2weight/b2_count
+format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
+
+replace ab1weight=ab1weight/2204
+rename ab1weight ab1mt
+replace b2weight=b2weight/2204
+rename b2weight b2mt
+
+
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
+sort year month 
+format ab1mt b2mt %10.2fc
+format ab1_count b2_count %10.0fc
+keep if year==$two_years
+<</dd_do>>
+
+<<dd_do>>
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count) 
+<</dd_do>>
+~~~~
+
+
+
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${last_year}.dta", clear
@@ -155,24 +466,47 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
 keep if year==$last_year
+tempfile last 
 <</dd_do>>
 
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count) 
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count) 
 <</dd_do>>
 ~~~~
 
 
 
-Here are the cod (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>. 
+
 ~~~~
 <<dd_do:quietly>>
-use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${this_year}.dta", clear
+use "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${this_working_year}.dta", clear
+
+qui summ month
+local max=r(max)
+
+if `max'<=9{
+preserve
+use "${my_outputdir}/cod_weights_${last_year}.dta", clear
+keep if month>`max'
+replace year=${this_working_year}
+tempfile appender
+save `appender'
+restore
+append using `appender'
+}
+sort year month
+
+
+
 
 gen ab1_lbs_per_fish=ab1weight/ab1_count
 gen b2_lbs_per_fish=b2weight/b2_count
@@ -183,15 +517,19 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
 
-keep if year==$this_year
+keep if year==$this_working_year
 <</dd_do>>
 <<dd_do>>
 
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
@@ -202,34 +540,97 @@ Catch Statistics for Haddock
 ===============================================================
 
 
-Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $last_year>>. 
+Here are the haddock (a, b1, b2) in numbers for Calendar Years <<dd_display: %4.0f $two_year>> to <<dd_display: %4.0f $this_working_year>>.  
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common2'_landings_${last_year}.dta", replace
+clear
+use "${my_outputdir}/`my_common2'_landings_${two_years}.dta"
+
 sort year month 
+format tot_cat* a b1 b2 landings* %10.0fc
+<</dd_do>>
+
+<<dd_do>>
+list, abbreviate(16)  sum(tot_cat* a b1 b2 landings*) sepby(year)
+<</dd_do>>
+
+<<dd_do:quietly>>
+clear
+use "${my_outputdir}/`my_common2'_landings_${last_year}.dta"
+sort year month 
+format tot_cat* a b1 b2 landings* %10.0fc
+<</dd_do>>
+
+<<dd_do>>
+list, abbreviate(16)  sum(tot_cat* a b1 b2 landings*) sepby(year)
+<</dd_do>>
+~~~~
+
+~~~~
+<<dd_do:quietly>>
+use "${my_outputdir}/`my_common2'_landings_${this_working_year}.dta", replace
+
+
+qui summ month
+local max=r(max)
+
+if `max'<=9{
+preserve
+use "${my_outputdir}/`my_common2'_landings_${last_year}.dta", clear
+keep if month>`max'
+replace year=${this_working_year}
+tempfile appender
+save `appender'
+restore
+append using `appender'
+}
+sort year month
+
+
+
+
 format tot_cat* a b1 b2 landings %10.0fc
 <</dd_do>>
+
 <<dd_do>>
 list , abbreviate(16)  sum(tot_cat* a b1 b2 landings*)
 <</dd_do>>
 ~~~~
 
-Here are the haddock (a, b1, b2) in numbers for Calendar Year <<dd_display: %4.0f $this_year>>.  With the data update, there are both b1's and B2s in April.
+
+Here are the haddock (a, b1, b2) in weights for Calendar Years <<dd_display: %4.0f $two_years>> to <<dd_display: %4.0f $this_working_year>>.  
+
+
 ~~~~
 <<dd_do:quietly>>
-use "${my_outputdir}/`my_common2'_landings_${this_year}.dta", replace
+use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${two_years}.dta", clear
+
+gen ab1_lbs_per_fish=ab1weight/ab1_count
+gen b2_lbs_per_fish=b2weight/b2_count
+format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
+
+replace ab1weight=ab1weight/2204
+rename ab1weight ab1mt
+replace b2weight=b2weight/2204
+rename b2weight b2mt
+
+
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
-format tot_cat* a b1 b2 landings* %10.0fc
+format ab1mt b2mt %10.2fc
+format ab1_count b2_count %10.0fc
+keep if year==$two_years
 <</dd_do>>
+
 <<dd_do>>
-list , abbreviate(16) sum(tot_cat* a b1 b2 landings*)
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count) 
 <</dd_do>>
 ~~~~
 
 
 
-
-Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $last_year>>.  
 ~~~~
 <<dd_do:quietly>>
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${last_year}.dta", clear
@@ -243,6 +644,9 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
@@ -251,16 +655,33 @@ keep if year==$last_year
 <</dd_do>>
 
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
 
-
-Here are the haddock (a+b1 and b2) in weights and numbers for Calendar Year <<dd_display: %4.0f $this_year>>. With the data update, there are both b1's and B2s in April.  There are also measured B2 haddock from July-October now.  The weights per fish look reasonable.
 ~~~~
 <<dd_do:quietly>>
-use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_year}.dta", clear
+use "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${this_working_year}.dta", clear
+
+
+qui summ month
+local max=r(max)
+
+if `max'<=9{
+preserve
+use "${my_outputdir}/haddock_weights_${last_year}.dta", clear
+keep if month>`max'
+replace year=${this_working_year}
+tempfile appender
+save `appender'
+restore
+append using `appender'
+}
+sort year month
+
+
+
 
 gen ab1_lbs_per_fish=ab1weight/ab1_count
 gen b2_lbs_per_fish=b2weight/b2_count
@@ -271,18 +692,90 @@ rename ab1weight ab1mt
 replace b2weight=b2weight/2204
 rename b2weight b2mt
 
+replace b2weight_dead=b2weight_dead/2204
+rename b2weight_dead b2dead_mt
+
 sort year month 
 format ab1mt b2mt %10.2fc
 format ab1_count b2_count %10.0fc
 
-keep if year==$this_year
+keep if year==$this_working_year
 <</dd_do>>
 <<dd_do>>
-list year month ab1mt b2mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt ab1_count b2_count)
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
 
+Length distributions for haddock landed. Just the Fish in the 15-19" range. There were no B2's measured on Private boats, so this assumes the B2's on private boats is similar to the B2s on ForHire and Charter vessels.
+
+
+
+<<dd_do:quietly>>
+
+use "${data_main}/MRIP_${vintage_string}/monthly/haddock_ab1_counts_${this_working_year}.dta", clear
+
+
+merge 1:1 year month l_in_bin using "${data_main}/MRIP_${vintage_string}/monthly/haddock_b2_counts_${this_working_year}.dta"
+drop _merge
+
+
+replace ab1_count=0 if ab1_count==.
+replace b2_count=0 if b2_count==.
+
+drop b2_UWcount
+
+gen total=ab1_count+b2_count
+gen pct_kept=ab1_count/total*100
+
+format ab1 b2 total %8.0fc
+
+format pct_kept %4.1fc
+rename l_in_bin inches
+rename ab1 landed
+<</dd_do>>
+
+~~~~
+<<dd_do>>
+list year month  inches total landed pct_kept if inches>=15 & inches<=18, sepby(month)
+<</dd_do>>
+~~~~
+
+Private size limit after August 15, 2023 is 17".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting at that time, 2023 nothing under 17" should be retained.
+
+There were no B2's measured on Private boats, so I've set the length distribution of the Private B2's to empty. There were also no ab1's measured on Private boats in April.  
+
+
+<<dd_do:quietly>>
+
+global mode_vintage 2023_11_30
+
+global mode_dir "${data_main}/MRIP_$mode_vintage/mode"
+
+use "${mode_dir}/haddock_size_mode_class_${working_year}.dta", clear
+keep if year==$working_year
+rename lngcat inches
+sort mode year month inches
+
+
+replace b2=. if mode=="Private"
+replace ab1=. if mode=="Private" & month==4
+
+format ab1  b2 %8.0fc
+<</dd_do>>
+
+~~~~
+<<dd_do>>
+list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="Private", sepby(month)
+<</dd_do>>
+~~~~
+
+For-Hire size limit after August 15, 2023 is 18".  MRIP data rounds down to the (a 17.9" fish is reported as 17").  Starting on August 15, 2023 nothing under 18" should be retained.
+~~~~
+<<dd_do>>
+list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="ForHire", sepby(month)
+<</dd_do>>
+~~~~
 
 
 

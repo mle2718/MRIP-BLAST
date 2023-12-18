@@ -125,12 +125,17 @@ rename  site_id intsite
 drop if _merge==2
 drop _merge
 
-/*classify into GOM or GBS */
-gen str3 area_s="OTH"
 
-replace area_s="GOM" if st==23 | st==33
-replace area_s="GOM" if st==25 & strmatch(stock_region_calc,"NORTH")
-replace area_s="GBS" if st==25 & strmatch(stock_region_calc,"SOUTH")
+/*classify into (O)ther, Gulf of (M)aine, or Georges (B)ank */
+gen str3 area_s="O"
+
+replace area_s="M" if st==23 | st==33
+replace area_s="M" if st==25 & strmatch(stock_region_calc,"NORTH")
+replace area_s="B" if st==25 & strmatch(stock_region_calc,"SOUTH")
+
+destring mode_fx, replace
+gen str mode="F" if inlist(mode_fx,4,5)
+replace mode="P" if mode==""
 
  /* classify catch into the things I care about (common==$mycommon) and things I don't care about "ZZZZZZZZ" use the id_code*/
  gen common_dom="zzzzzz"
@@ -153,7 +158,8 @@ drop month
 tostring mymo, gen(month)
 drop mymo
 
-gen my_dom_id_string=area_s+"_"+month+"_"+common_dom
+gen my_dom_id_string=area_s+"_"+mode + "_"+month+"_"+common_dom
+
 
 replace my_dom_id_string=subinstr(ltrim(rtrim(my_dom_id_string))," ","",.)
 encode my_dom_id_string, gen(my_dom_id)
@@ -198,7 +204,7 @@ local myv l_in_bin
 	
 
 	
-	keep `myv' GOM*
+	keep `myv' M*
 	drop *_z*
 	gen year=$working_year
 	
@@ -206,14 +212,17 @@ local myv l_in_bin
 	*if there are GOM variables, then do some stuff there will be GOM _species variables if qui desc produces r(k) >=2
 	qui desc
 	if r(k)>=3{
-	foreach var of varlist GOM*{
+	foreach var of varlist M*{
 	tokenize `var', parse("_")
-	rename `var' `1'`3'
+	rename `var' `1'`3'`5'
 	}
 	
 	
-	reshape long GOM, i(l_in_bin) j(month)
-	rename GOM count
+	reshape long MF MP, i(l_in_bin year) j(month)
+	reshape long M, i(l_in_bin year month) j(mode) string
+	rename M count
+	replace mode="ForHire" if mode=="F"
+	replace mode="Private" if mode=="P"
 	}
 	else{
 	keep year
@@ -270,7 +279,7 @@ local myv l_in_bin
 	
 
 	
-	keep `myv' GOM*
+	keep `myv' M*
 	drop *_z*
 	gen year=$working_year
 	
@@ -278,14 +287,17 @@ local myv l_in_bin
 	*if there are GOM variables, then do some stuff there will be GOM _species variables if qui desc produces r(k) >=2
 	qui desc
 	if r(k)>=3{
-	foreach var of varlist GOM*{
+	foreach var of varlist M*{
 	tokenize `var', parse("_")
-	rename `var' `1'`3'
+	rename `var' `1'`3'`5'
 	}
 	
 	
-	reshape long GOM, i(l_in_bin) j(month)
-	rename GOM count_UW
+	reshape long MF MP, i(l_in_bin year) j(month)
+	reshape long M, i(l_in_bin year month) j(mode) string
+	rename M count_UW
+	replace mode="ForHire" if mode=="F"
+	replace mode="Private" if mode=="P"
 	}
 	else{
 	keep year
@@ -304,10 +316,10 @@ local myv l_in_bin
 	order year month l_in_bin
 	keep if year==${working_year}
 	
-	merge 1:1 year month l_in_bin using `b2W'
+	merge 1:1 year month l_in_bin mode using `b2W'
 	assert _merge==3
 	drop _merge
-	save "$my_outputdir/$my_common`myv'_b2_${working_year}.dta", replace
+	save "$my_outputdir/$my_common`myv'_mode_b2_${working_year}.dta", replace
 
 
 

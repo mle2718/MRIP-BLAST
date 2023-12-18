@@ -1,9 +1,20 @@
+use "${data_main}/MRIP_${vintage_string}/monthly/haddock_b2_counts_${working_year}.dta", clear
+
+gen discard_mortality=.113 if month<=6 & l_in_bin>=20
+replace discard_mortality=.459 if month>6 & l_in_bin>=20
+
+replace discard_mortality=.321 if month<=6 & l_in_bin<20
+replace discard_mortality=.742 if month>6 & l_in_bin<20
+
+tempfile b2_adj
+save `b2_adj', replace
+
 
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_ab1_counts_${working_year}.dta", clear
 
 
 
-merge 1:1 year month l_in_bin using "${data_main}/MRIP_${vintage_string}/monthly/haddock_b2_counts_${working_year}.dta"
+merge 1:1 year month l_in_bin using `b2_adj'
 replace ab1_count=0 if ab1_count==.
 replace b2_count=0 if b2_count==.
 gen countnumbersoffish=round(ab1_count+b2_count)
@@ -28,6 +39,9 @@ global cmtoinch= 0.39370787
 global kilotolb=2.20462262
 
 drop if l_in_bin==0
+
+/* l_in_bin from MRIP is length of catch, rounded down to the nearest inch */
+
 gen weight_per_fish= $kilotolb*$hada*((l_in_bin+.5)/$cmtoinch)^$hade
 
 
@@ -37,6 +51,9 @@ gen b2weight=round(b2_count)*weight_per_fish
 keep if year==$working_year
 
 drop if l_in_bin==0
-collapse (sum) ab1weight b2weight ab1_count b2_count, by(year month)
+
+gen b2weight_dead=round(b2_count)*weight_per_fish*discard_mortality
+
+collapse (sum) ab1weight b2weight b2weight_dead ab1_count b2_count , by(year month)
 
 save "${data_main}/MRIP_${vintage_string}/monthly/haddock_weights_${working_year}.dta", replace

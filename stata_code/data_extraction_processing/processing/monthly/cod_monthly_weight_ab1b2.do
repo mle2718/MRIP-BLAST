@@ -5,6 +5,9 @@ use "${data_main}/MRIP_${vintage_string}/monthly/atlanticcod_ab1_counts_${workin
 *rename count ab1_count
 
 merge 1:1 year month l_in_bin using "${data_main}/MRIP_${vintage_string}/monthly/atlanticcod_b2_counts_${working_year}.dta"
+
+gen discard_mortality=.15
+
 replace ab1_count=0 if ab1_count==.
 replace b2_count=0 if b2_count==.
 gen countnumbersoffish=round(ab1_count+b2_count)
@@ -28,6 +31,9 @@ global codb=3.1625
 global cmtoinch= 0.39370787
 global kilotolb=2.20462262
 
+
+/* l_in_bin from MRIP is length of catch, rounded down to the nearest inch */
+
 drop if l_in_bin==0
 gen weight_per_fish= $kilotolb*$coda*((l_in_bin+.5)/$cmtoinch)^$codb
 
@@ -35,10 +41,11 @@ gen weight_per_fish= $kilotolb*$coda*((l_in_bin+.5)/$cmtoinch)^$codb
 
 gen ab1weight=round(ab1_count)*weight_per_fish
 gen b2weight=round(b2_count)*weight_per_fish
+gen b2weight_dead=round(b2_count)*weight_per_fish*discard_mortality
 
 keep if year==$working_year
 
 drop if l_in_bin==0
-collapse (sum) ab1weight b2weight ab1_count b2_count, by(year month)
+collapse (sum) ab1weight b2weight b2weight_dead ab1_count b2_count, by(year month)
 
 save "${data_main}/MRIP_${vintage_string}/monthly/cod_weights_${working_year}.dta", replace

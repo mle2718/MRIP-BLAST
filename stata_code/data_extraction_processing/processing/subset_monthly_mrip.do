@@ -2,8 +2,7 @@
 
 pause off
 
-global stacked_dir "${data_main}/MRIP_$vintage_string/stacked_monthly"
-global BLAST_DIR "${BLAST_root}/cod_haddock_fy2023/source_data/mrip"
+*global stacked_month "${data_main}/MRIP_$vintage_string/stacked_monthly"
 
 global hmin 17
 global cmin 22
@@ -11,9 +10,11 @@ global cmin 22
 
 
 /* which fishing year do you want */
-local yr1 2021 
-local yr1 2022 
+local yr1 $this_working_year 
+
 local lastyr=`yr1'-1
+
+
 
 /***********************************************************************************************/
 /***********************************************************************************************/
@@ -24,7 +25,7 @@ local lastyr=`yr1'-1
 /*******************BEGIN COD **************************************/
 
 /*Load in the stacked monthly catch class distributions*/
-use ${stacked_dir}/monthly_cod_catch_class.dta, replace
+use ${stacked_month}/monthly_cod_catch_class.dta, replace
 
 keep if fishing_year==`yr1'
 
@@ -45,14 +46,14 @@ local last =r(max)
 /* this only works if there are missing months at the beginning or end, not in the middle */
 /* we borrow from the previous year if we are missing data */
 
-use ${stacked_dir}/monthly_cod_catch_class.dta, replace
+use ${stacked_month}/monthly_cod_catch_class.dta, replace
 keep if fishing_year==`lastyr'
 keep if month<`first '| month>`last'
 replace fishing_year=`yr1'
 tempfile fillin
 save `fillin', replace
 
-use ${stacked_dir}/monthly_cod_catch_class.dta, replace
+use ${stacked_month}/monthly_cod_catch_class.dta, replace
 append using `fillin'
 
 tempfile partial
@@ -123,7 +124,7 @@ graph export "${my_images_vintage}/cod_catch_classPno0_`yr1'.tif", as(tif) repla
 /*******************BEGIN HADDOCK **************************************/
 
 /*Load in the stacked monthly catch class distributions*/
-use ${stacked_dir}/monthly_haddock_catch_class.dta, replace
+use ${stacked_month}/monthly_haddock_catch_class.dta, replace
 
 keep if fishing_year==`yr1'
 
@@ -147,14 +148,14 @@ local last =r(max)
 /* this only works if there are missing months at the beginning or end, not in the middle */
 /* we borrow from the previous year if we are missing data */
 
-use ${stacked_dir}/monthly_haddock_catch_class.dta, replace
+use ${stacked_month}/monthly_haddock_catch_class.dta, replace
 keep if fishing_year==`lastyr'
 keep if month<`first '| month>`last'
 replace fishing_year=`yr1'
 tempfile fillin
 save `fillin', replace
 
-use ${stacked_dir}/monthly_haddock_catch_class.dta, replace
+use ${stacked_month}/monthly_haddock_catch_class.dta, replace
 append using `fillin'
 
 tempfile partial
@@ -247,7 +248,7 @@ graph export "${my_images_vintage}/haddock_catch_classPno0_`yr1'.tif", as(tif) r
 
 
 /*read in the size class distributions. Keep just the relevant FY. */
-use ${stacked_dir}/monthly_cod_size_class.dta, replace
+use ${stacked_month}/monthly_cod_size_class.dta, replace
 
 
 
@@ -276,7 +277,7 @@ local last =r(max)
 /* this only works if there are missing months at the beginning or end, not in the middle */
 /* we borrow from the previous year if we are missing data */
 
-use ${stacked_dir}/monthly_cod_size_class.dta, replace
+use ${stacked_month}/monthly_cod_size_class.dta, replace
 keep if fishing_year==`lastyr'
 keep if month<`first '| month>`last'
 
@@ -286,7 +287,7 @@ replace fishing_year=`yr1'
 tempfile fillin
 save `fillin', replace
 
-use ${stacked_dir}/monthly_cod_size_class.dta, replace
+use ${stacked_month}/monthly_cod_size_class.dta, replace
 append using `fillin'
 
 tempfile partial
@@ -355,7 +356,7 @@ graph export "${my_images_vintage}/cod_size_classP_`yr1'.tif", as(tif) replace
 
 
 /*read in the size class distributions. Keep just the relevant FY. */
-use ${stacked_dir}/monthly_haddock_size_class.dta, replace
+use ${stacked_month}/monthly_haddock_size_class.dta, replace
 
 
 
@@ -383,7 +384,7 @@ local last =r(max)
 /* this only works if there are missing months at the beginning or end, not in the middle */
 /* we borrow from the previous year if we are missing data */
 
-use ${stacked_dir}/monthly_haddock_size_class.dta, replace
+use ${stacked_month}/monthly_haddock_size_class.dta, replace
 keep if fishing_year==`lastyr'
 keep if month<`first '| month>`last'
 
@@ -393,7 +394,7 @@ replace fishing_year=`yr1'
 tempfile fillin
 save `fillin', replace
 
-use ${stacked_dir}/monthly_haddock_size_class.dta, replace
+use ${stacked_month}/monthly_haddock_size_class.dta, replace
 append using `fillin'
 
 tempfile partial

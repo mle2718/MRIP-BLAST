@@ -1,54 +1,17 @@
-/* This is just a little helper file that calls all the monthly files and stacks the data into single datasets 
-It also aggregates everything into the proper format for the recreational bioeconomic model 
-It's quite awesome.
+/* Compute lengths by grouped_mode
 
+a, b1, b2 by for (ForHire=Party+charter and Private=Private+shore)
 
-
-Running survey commands on multiple years takes a very long time. 
-
-In order to do a data update, you will need to:
-
-1. run the copy_over_raw_mrip.do to copy and convert the sas7bdat files to dta. 
-
-2. Run get_ma_allocation to get Recreation sites for MA (NORTH SOUTH) and 
-
-3. Change the working year to the most recent year.
-
-	CHECK for missing waves in the "ab1_lengths", catch totals, catch frequencies.
-	
-
-	Because there are relatively few observations in FY2020, we decided to use the annual length-frequency distribution. 
-	However, we will want to do catch per trip at either the wave or month level.
- */
+*/
 
  
 global workdir "${data_main}/MRIP_$vintage_string"
 capture mkdir "$workdir"
-global my_outputdir "${workdir}/monthly"
+global my_outputdir "${workdir}/mode"
 capture mkdir "$my_outputdir"
 
 
 
-
-
-
-/* readin the 2b95 landings  */
-clear
-input year 	month 	trimmed_landings
-2020 	5   63
-2020 	6 	2267
-2020 	7 	1465
-2020 	8 	3912
-2020 	9 	7829
-2020 	10 	955
-2020 	11 	0
-2021 	4 	1434
-2021 	5 	10
-2021 	6 	517
-2021 	7 	61
-2021 	8 	258
-end
-save "${my_outputdir}/atlanticcod_landings_2b95.dta", replace
 
 
 
@@ -68,7 +31,6 @@ save "${my_outputdir}/atlanticcod_landings_2b95.dta", replace
 foreach yr of global process_list {
 	global working_year `yr'
 	global previous_year=$working_year-1
-
 
 global wavelist 1 2 3 4 5 6
 global species1 "atlanticcod"
@@ -118,7 +80,7 @@ foreach sp in atlanticcod haddock{
     global drop_conditional 
 	}
 
-	do "${processing_code}/monthly/domain_catch_frequencies_gom_month.do"
+	do "${processing_code}/mode/domain_catch_mode_frequencies_gom_month.do"
 }
 
 /* catch totals  -- these are done for all 3 years at once*/
@@ -131,7 +93,7 @@ global my_common "atlanticcod"
 		global drop_conditional 
 	}
 
-do "${processing_code}/monthly/domain_cod_monthly_catch_totals.do"
+do "${processing_code}/mode/domain_cod_mode_monthly_catch_totals.do"
 
 
 
@@ -144,8 +106,8 @@ read it in and merge.  rename landings old_landings. and rename trim_landings ju
 
 
 
-use "$my_outputdir/atlanticcod_catch_$working_year.dta", clear
-keep year month tot_cat claim harvest release
+use "$my_outputdir/atlanticcod_catch_mode_$working_year.dta", clear
+keep year month mode tot_cat claim harvest release
 rename claim a
 rename harvest b1
 rename release b2
@@ -153,31 +115,8 @@ rename tot_cat tot_catch
 gen landings=a+b1
 capture destring month, replace
 
-/*substitute the 2b95 landings for cod in FY 2020 only 
-This is May 2020 to April of 2021 only 
-*/
-if inlist($working_year,2020){
-	merge 1:1 year month using  "${my_outputdir}/atlanticcod_landings_2b95.dta", keep(1 3)
-replace trimmed_landings=0 if trimmed_landings==. & _merge==1
-drop _merge
-rename landings landings_old
-rename trimmed_landings landings
-rename tot_cat tot_cat_old
-gen tot_catch=landings+b2
-}
 
-/* substitute only for months 1 to 4 */
-if inlist($working_year,2021){
-	merge 1:1 year month using  "${my_outputdir}/atlanticcod_landings_2b95.dta", keep(1 3)
-drop _merge
-clonevar landings_old= landings
-replace landings= trimmed_landings if inlist(month,1,2,3,4)
-rename tot_cat tot_cat_old
-gen tot_catch=landings+b2
-}
-
-
-save "$my_outputdir/atlanticcod_landings_$working_year.dta", replace
+save "$my_outputdir/atlanticcod_landings_mode_$working_year.dta", replace
 
 
 
@@ -192,20 +131,18 @@ else {
 
 	
 	
-do "${processing_code}/monthly/domain_haddock_monthly_catch_totals.do"
+do "${processing_code}/mode/domain_haddock_mode_monthly_catch_totals.do"
 
 
-use "$my_outputdir/haddock_catch_$working_year.dta", clear
-keep year month tot_cat claim harvest release
+use "$my_outputdir/haddock_catch_mode_$working_year.dta", clear
+keep year month mode tot_cat claim harvest release
 rename claim a
 rename harvest b1
 rename release b2
 rename tot_cat tot_catch
 gen landings=a+b1
 capture destring month, replace
-save "$my_outputdir/haddock_landings_$working_year.dta", replace
-
-
+save "$my_outputdir/haddock_landings_mode_$working_year.dta", replace
 
 
 
@@ -230,12 +167,12 @@ foreach sp in atlanticcod haddock{
     global drop_conditional 
 	}
 
-	do "${processing_code}/monthly/length_freqs_by_month_gom.do"
+	do "${processing_code}/mode/length_freqs_by_mode_month_gom.do"
 }
 
 
 /*stack together multiple, cleanup extras and delete */
-local cod_wave_ab1: dir "$my_outputdir" files "atlanticcodl_in_bin_a1b1*.dta"
+local cod_wave_ab1: dir "$my_outputdir" files "atlanticcodl_in_bin_mode_a1b1*.dta"
 
 clear
 foreach file of local cod_wave_ab1{
@@ -243,14 +180,14 @@ foreach file of local cod_wave_ab1{
 	! rm ${my_outputdir}/`file'
 }
 keep if year==$working_year
-save "$my_outputdir/cod_ab1_$working_year.dta", replace
+save "$my_outputdir/cod_ab1_mode_$working_year.dta", replace
 
 
 
 
 
 /*stack together multiple, cleanup extras and delete */
-local haddock_wave_ab1: dir "$my_outputdir" files "haddockl_in_bin_a1b1*.dta"
+local haddock_wave_ab1: dir "$my_outputdir" files "haddockl_in_bin_mode_a1b1*.dta"
 clear
 foreach file of local haddock_wave_ab1{
 	append using ${my_outputdir}/`file'
@@ -258,7 +195,7 @@ foreach file of local haddock_wave_ab1{
 }
 keep if year==$working_year
 
-save "$my_outputdir/haddock_ab1_$working_year.dta", replace
+save "$my_outputdir/haddock_ab1_mode_$working_year.dta", replace
 
 
 
@@ -275,7 +212,7 @@ foreach sp in atlanticcod haddock{
     global drop_conditional 
 	}
 
-	do "${processing_code}/monthly/b2_length_freqs_by_month_gom.do"
+	do "${processing_code}/mode/b2_length_freqs_by_mode_month_gom.do"
 }
 
 
@@ -283,8 +220,8 @@ foreach sp in atlanticcod haddock{
 
 /*stack the weighted B2s into a single dataset */
 clear
-local cod_wave_b2: dir "$my_outputdir" files "atlanticcodl_in_bin_b2*.dta"
-local haddock_wave_b2: dir "$my_outputdir" files "haddockl_in_bin_b2*.dta"
+local cod_wave_b2: dir "$my_outputdir" files "atlanticcodl_in_bin_mode_b2*.dta"
+local haddock_wave_b2: dir "$my_outputdir" files "haddockl_in_bin_mode_b2*.dta"
 
 	clear
 
@@ -295,7 +232,7 @@ foreach file of local cod_wave_b2{
 keep if year==$working_year
 
 capture destring month, replace
-save "$my_outputdir/cod_b2_$working_year.dta", replace
+save "$my_outputdir/cod_b2_mode_$working_year.dta", replace
 	clear
 
 foreach file of local haddock_wave_b2{
@@ -306,62 +243,18 @@ foreach file of local haddock_wave_b2{
 capture destring month, replace
 keep if year==$working_year
 
-save "$my_outputdir/haddock_b2_$working_year.dta", replace
+save "$my_outputdir/haddock_b2_mode_$working_year.dta", replace
+
+
+/* this should work up to here */
 
 
 /* join the b2 length data with the total number of released to get the length distribution for the number of fish released */
-do "${processing_code}/monthly/process_b2_cod.do"
-do "${processing_code}/monthly/process_b2_haddock.do"
-
-
-
-
-global drop_conditional `"if (id_code=="1792820210410001" | id_code=="1757420210428005")  "'
-
-
-/* caught/targeted haddock or caught cod by wave */
-do "${processing_code}/monthly/haddock_plus_directed_trips_by_month.do"
-
-
-
-/* caught/targeted cod or haddock by wave */
-
-do "${processing_code}/monthly/cod_haddock_directed_trips_by_month.do"
-
-
-
-do "${processing_code}/mode/cod_haddock_directed_trips_by_month_mode.do"
-
-
-
-do "${processing_code}/mode/cod_haddock_directed_trips_by_month_disagg_mode.do"
-
-
-
-/* caught/targeted cod by wave */
-do "${processing_code}/monthly/cod_directed_trips_by_month.do"
-
-
-/* caught/targeted haddock by wave */
-do "${processing_code}/monthly/haddock_directed_trips_by_month.do"
-
-
-
-
-
-
-
-
-/* caught/targeted haddock or caught cod by wave */
-do "${processing_code}/monthly/cod_monthly_weight_ab1b2.do"
-
-
-
-/* caught/targeted haddock or caught cod by wave */
-do "${processing_code}/monthly/haddock_monthly_weight_ab1b2.do"
-
-
+do "${processing_code}/mode/process_b2_mode_cod.do"
+do "${processing_code}/mode/process_b2_mode_haddock.do"
 
 }
+
+
 
 

@@ -6,18 +6,12 @@ Convert the monthly data to fishing-year data. We always substitute "non-availab
 
 pause off
 
-global stacked_dir "${data_main}/MRIP_$vintage_string/stacked_monthly"
-global BLAST_DIR "${BLAST_root}/cod_haddock_fy2023/source_data/mrip"
-
-global my_images_vintage "${my_images}/MRIP_$vintage_string"
-cap mkdir $my_images_vintage
 
 global hmin 17
 global cmin 22
 
 
 /* which fishing year do you want */
-*local yr1 2021 
 local yr1 $this_working_year 
 
 local lastyr=`yr1'-1
@@ -31,7 +25,7 @@ local lastyr=`yr1'-1
 /*******************BEGIN COD **************************************/
 
 /*Load in the stacked monthly catch class distributions*/
-use ${stacked_dir}/monthly_cod_catch_class.dta, replace
+use ${stacked_month}/monthly_cod_catch_class.dta, replace
 
 
 
@@ -80,7 +74,7 @@ graph export "${my_images_vintage}/cod_catch_classPno0_ANNUAL`yr1'.tif", as(tif)
 /*******************BEGIN HADDOCK **************************************/
 
 /*Load in the stacked monthly catch class distributions*/
-use ${stacked_dir}/monthly_haddock_catch_class.dta, replace
+use ${stacked_month}/monthly_haddock_catch_class.dta, replace
 
 
 
@@ -151,7 +145,7 @@ graph export "${my_images_vintage}/haddock_catch_classPno0_ANNUAL`yr1'.tif", as(
 
 
 /*read in the size class distributions. Keep just the relevant FY. Collapse*/
-use ${stacked_dir}/monthly_cod_size_class.dta, replace
+use ${stacked_month}/monthly_cod_size_class.dta, replace
 
 
 keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
@@ -187,7 +181,7 @@ graph export "${my_images_vintage}/cod_size_classP_ANNUAL`yr1'.tif", as(tif) rep
 
 
 /*read in the size class distributions. Keep just the relevant FY. Collapse*/
-use ${stacked_dir}/monthly_cod_size_class.dta, replace
+use ${stacked_month}/monthly_cod_size_class.dta, replace
 
 
 keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
@@ -254,7 +248,7 @@ graph export "${my_images_vintage}/cod_size_classP_OPEN_SPLIT`yr1'.tif", as(tif)
 
 
 /*read in the size class distributions. Keep just the relevant FY. Collapse*/
-use ${stacked_dir}/monthly_haddock_size_class.dta, replace
+use ${stacked_month}/monthly_haddock_size_class.dta, replace
 
 
 keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,12))
