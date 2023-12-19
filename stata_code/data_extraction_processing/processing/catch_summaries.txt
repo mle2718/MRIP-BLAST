@@ -748,12 +748,10 @@ There were no B2's measured on Private boats, so I've set the length distributio
 
 <<dd_do:quietly>>
 
-global mode_vintage 2023_11_30
+global mode_dir "${data_main}/MRIP_${vintage_string}/mode"
 
-global mode_dir "${data_main}/MRIP_$mode_vintage/mode"
-
-use "${mode_dir}/haddock_size_mode_class_${working_year}.dta", clear
-keep if year==$working_year
+use "${mode_dir}/haddock_size_mode_class_${this_working_year}.dta", clear
+keep if year==$this_working_year
 rename lngcat inches
 sort mode year month inches
 
