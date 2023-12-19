@@ -39,9 +39,9 @@ gen weight_per_fish= $kilotolb*$coda*((l_in_bin+.5)/$cmtoinch)^$codb
 
 
 
-gen ab1weight=round(ab1_count)*weight_per_fish
-gen b2weight=round(b2_count)*weight_per_fish
-gen b2weight_dead=round(b2_count)*weight_per_fish*discard_mortality
+gen ab1weight=ab1_count*weight_per_fish
+gen b2weight=b2_count*weight_per_fish
+gen b2weight_dead=b2_count*weight_per_fish*discard_mortality
 
 keep if year==$working_year
 

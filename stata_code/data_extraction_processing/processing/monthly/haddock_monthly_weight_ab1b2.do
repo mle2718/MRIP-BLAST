@@ -45,14 +45,14 @@ drop if l_in_bin==0
 gen weight_per_fish= $kilotolb*$hada*((l_in_bin+.5)/$cmtoinch)^$hade
 
 
-gen ab1weight=round(ab1_count)*weight_per_fish
-gen b2weight=round(b2_count)*weight_per_fish
+gen ab1weight=ab1_count*weight_per_fish
+gen b2weight=b2_count*weight_per_fish
 
 keep if year==$working_year
 
 drop if l_in_bin==0
 
-gen b2weight_dead=round(b2_count)*weight_per_fish*discard_mortality
+gen b2weight_dead=b2_count*weight_per_fish*discard_mortality
 
 collapse (sum) ab1weight b2weight b2weight_dead ab1_count b2_count , by(year month)
 
