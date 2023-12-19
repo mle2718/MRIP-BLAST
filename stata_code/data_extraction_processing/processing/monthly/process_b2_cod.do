@@ -91,22 +91,12 @@ save "$my_outputdir/atlanticcod_b2_counts_$working_year.dta", replace
 
 use "$my_outputdir/cod_ab1_$working_year.dta", clear
 
-/*
-expand 2 if month==5 & year==2013
-drop if month==6 & year==2013
-
-bysort year month l_in_bin: gen mark=_n
-replace month=6 if mark==2 & year==2013 & month==5
-
-drop mark
-*/
-
 sort year month
 
 cap drop _merge
 merge m:1 year month using `claim_harvest'
 
-
+drop if l_in_bin==.
 tempvar ttt
 bysort year month: egen `ttt'=total(count)
 gen prob=count/`ttt'
