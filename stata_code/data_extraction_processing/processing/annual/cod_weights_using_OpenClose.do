@@ -15,7 +15,7 @@ global mortality_release=0.15
 
 
 
-use "$my_outputdir/cod_size_class_OpenClose_$this_working_year.dta" if open=="OPEN", clear
+use "$annual/cod_size_class_OpenClose_$this_working_year.dta" if open=="OPEN", clear
 expand 2 , gen(mark)
 gen month=9
 replace month=10 if mark==1
@@ -25,7 +25,7 @@ tempfile open
 save `open'
 
 
-use "$my_outputdir/cod_size_class_OpenClose_$this_working_year.dta" if open=="CLOSED", clear
+use "$annual/cod_size_class_OpenClose_$this_working_year.dta" if open=="CLOSED", clear
 expand 12
 bysort year open lngcat: gen month=_n
 drop if inlist(month,9,10)
@@ -73,8 +73,8 @@ gen b2dead_mt=b2mt*$mortality_release
 
 format ab1_count b2_count %10.0fc
 
-format b2mt ab1mt b2dead_mt %6.1fc
+format b2mt ab1mt b2dead_mt %6.2fc
 
-save "$my_outputdir\atlanticcod_weights_OpenClose_${this_working_year}.dta", replace
+save "$annual\atlanticcod_weights_OpenClose_${this_working_year}.dta", replace
 
 

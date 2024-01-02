@@ -82,7 +82,7 @@ do "$processing_code/batch_file_to_process_OpenClose_mrip_data.do"
 
 
 
-
+do "$processing_code/annual/cod_weights_using_OpenClose.do"
 
 
 
