@@ -29,7 +29,7 @@ dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summarie
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2023_12_18
+global vintage_string 2024_01_02
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
@@ -56,7 +56,7 @@ global hadd_recACL2023=610
 global cod_recACL2023=192
 
 
-global mrip_vintage "2023_12_18"
+global mrip_vintage "2024_01_02"
 
 global hadd_recACL2024=759
 global cod_recACL2024=192
