@@ -78,6 +78,22 @@ do "$processing_code/batch_file_to_process_OpenClose_mrip_data.do"
 
 
 
+/*apply Open/Close distributions to the monthly catches */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

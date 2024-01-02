@@ -16,6 +16,7 @@ if strmatch("$user","minyangWin"){
 /* setup directories */
 global code_dir "${project_dir}/stata_code"
 global working_data "${project_dir}/working_data"
+global my_annualdir "${data_main}/MRIP_$vintage_string/annual"
 global output_dir "${project_dir}/output"
 global this_working_year 2023
 global last_year = $this_working_year - 1
@@ -33,6 +34,7 @@ dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summarie
 do $MRIP_BLAST
 global vintage_string 2024_01_02
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
+global my_annualdir "${data_main}/MRIP_$vintage_string/annual"
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
 global BLAST_DIR "${BLAST_root}/cod_haddock_fy2024/source_data/mrip"
 local my_common1 "atlanticcod"
@@ -571,80 +573,14 @@ list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_
 
 
 
-### These weights are computed using the annual length distribution of catch
+### These weights are computed using the length distribution of catch for the Open and Closed periods separately
 
 ~~~~
-<<dd_do:quietly>>
-
-
-
-/* load in total catch */
-
-
-
-use "${BLAST_DIR}/cod_size_class_ANNUAL${this_working_year}.dta", replace
-/*lngcat fishing_year count month*/
-drop fishing_year
-
-bysort month: egen t=total(count)
-gen prob=count/t
-keep month lngcat prob
-
-tempfile lengths
-save `lengths'
-
-
-
-
-use ${data_main}/MRIP_${vintage_string}\monthly\atlanticcod_catch_${this_working_year}.dta
-gen landings=claim+harvest
-keep year month landings release
-destring month, replace
-merge 1:m month using `lengths', keep(1 3)
-
-
-gen count_release=prob*release
-gen count_landings=prob*landings
-
-
-collapse (sum) count_release count_landings, by(year month lngcat)
-/* compute weights */
-
-
-/* l_in_bin from MRIP is length of catch, rounded down to the nearest inch */
-
-gen weight_per_fish= $kilo_to_lbs*$cod_lwa*((lngcat+.5)/$cm_to_inch)^$cod_lwb
-gen landed_weight=weight_per_fish*count_landings
-gen released_weight=weight_per_fish*count_release
-
-collapse (sum) count_release count_landings landed_weight released_weight, by(year month)
-
-
-gen ab1_lbs_per_fish=landed_weight /count_landings 
-gen b2_lbs_per_fish=released_weight/count_release 
-
-
-replace landed_weight=landed_weight/($mt_to_kilo*$kilo_to_lbs)
-replace released_weight=released_weight/($mt_to_kilo*$kilo_to_lbs)
-rename landed_weight ab1mt 
-rename released_weight b2mt 
-
-rename count_landings ab1_count 
-rename count_release  b2_count 
-
-gen b2dead_mt=b2mt*$mortality_release
-
-format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
-
-
-format ab1_count b2_count %10.0fc
-
-format b2mt ab1mt b2dead_mt %6.1fc
-
-<</dd_do>>
 <<dd_do>>
 
-list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
+/* load in total catch */
+use "${my_annualdir}/atlanticcod_weights_OpenClose_${this_working_year}.dta", replace
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
 
