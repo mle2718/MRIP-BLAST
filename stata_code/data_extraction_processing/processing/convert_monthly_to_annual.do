@@ -47,17 +47,19 @@ save "${BLAST_DIR}/cod_catch_class_ANNUAL`yr1'.dta", replace
 replace count=count/1000
 label var count "count 1000s"
 xtline count
+xtline count if month==9 , subtitle("Averaged across all months")
 graph export "${my_images_vintage}/cod_catch_class_ANNUAL`yr1'.tif", as(tif) replace
 
-xtline count if num_fish>0
+xtline count if month==9 & num_fish>0, subtitle("Averaged across all months, no zeros")
 graph export "${my_images_vintage}/cod_catch_class_no0_ANNUAL`yr1'.tif", as(tif) replace
 
 
 bysort month: egen tc=total(count)
 gen prob=count/tc
-xtline prob
+xtline prob if month==9 , subtitle("Averaged across all months")
+
 graph export "${my_images_vintage}/cod_catch_classP_ANNUAL`yr1'.tif", as(tif) replace
-xtline prob if num_fish>0
+xtline prob if month==9 & num_fish>0, subtitle("Averaged across all months, no zeros")
 graph export "${my_images_vintage}/cod_catch_classPno0_ANNUAL`yr1'.tif", as(tif) replace
 
 
@@ -98,18 +100,21 @@ save "${BLAST_DIR}/haddock_catch_class_ANNUAL`yr1'.dta", replace
 replace count=count/1000
 label var count "count 1000s"
 xtline count
+xtline count if month==9 , subtitle("Averaged across all months")
+
 graph export "${my_images_vintage}/haddock_catch_class_ANNUAL`yr1'.tif", as(tif) replace
 
-xtline count if num_fish>0
+xtline count if month==9 & num_fish>0, subtitle("Averaged across all months, no zeros")
 graph export "${my_images_vintage}/haddock_catch_class_no0_ANNUAL`yr1'.tif", as(tif) replace
 
 
 bysort month: egen tc=total(count)
 gen prob=count/tc
-xtline prob
+xtline prob if month==9 , subtitle("Averaged across all months")
 graph export "${my_images_vintage}/haddock_catch_classP_ANNUAL`yr1'.tif", as(tif) replace
 
-xtline prob if num_fish>0
+xtline prob if month==9 & num_fish>0, subtitle("Averaged across all months, no zeros")
+
 graph export "${my_images_vintage}/haddock_catch_classPno0_ANNUAL`yr1'.tif", as(tif) replace
 
 /*******************END HADDOCK **************************************/
@@ -166,14 +171,14 @@ save "${BLAST_DIR}/cod_size_class_ANNUAL`yr1'.dta", replace
 
 replace count=count/1000
 label var count "count 1000s"
-xtline count, xline($cmin)
+xtline count if month==9, xline($cmin) subtitle("Averaged across all months")
 graph export  "${my_images_vintage}/cod_size_class_ANNUAL`yr1'.tif", as(tif) replace
 
 
 
 bysort month: egen tc=total(count)
 gen prob=count/tc
-xtline prob, xline($cmin)
+xtline prob if month==9, xline($cmin) subtitle("Averaged across all months")
 graph export "${my_images_vintage}/cod_size_classP_ANNUAL`yr1'.tif", as(tif) replace
 
 
@@ -188,27 +193,26 @@ keep if fishing_year==`yr1' | (fishing_year==`lastyr' & inlist(month,1,2,3,4,11,
 replace fishing_year=`yr1'
 
 
-gen open=inlist(month,4,9,10)
+gen open=inlist(month,9,10)
 collapse (sum) count, by(lngcat fishing_year open)
 preserve
 keep if open==1
-expand 3, gen(o1)
+expand 2, gen(o1)
 sort fishing_year  lngcat
 
-gen month=4 if o1==0
+gen month=9 if o1==0
 sort fishing_year lngcat o1
-bysort fishing_year lngcat: replace month=_n+7 if o1==1
+bysort fishing_year lngcat: replace month=_n+8 if o1==1
 tempfile open
 drop o1
 save `open', replace
 restore
 
 keep if open==0
-expand 9, gen(cl)
+expand 10, gen(cl)
 sort fishing_year lngcat cl
 bysort fishing_year lngcat: gen month=_n 
-bysort fishing_year lngcat: replace month=_n+1 if month>=4
-bysort fishing_year lngcat: replace month=_n+3 if month>=9
+bysort fishing_year lngcat: replace month=_n+2 if month>=9
 
 
 append using `open'
@@ -221,18 +225,25 @@ save "${BLAST_DIR}/cod_size_class_OPEN_SPLIT`yr1'.dta", replace
 
 xtset month lng
 
+bysort month: egen tc=total(count)
 
 
 replace count=count/1000
 label var count "count 1000s"
-xtline count, xline($cmin)
+
+gen open="open"
+replace open="closed" if month==8
+xtline count if inlist(month,8,9), xline($cmin) i(open) t(lng)
+
 graph export  "${my_images_vintage}/cod_size_class_OPEN_SPLIT`yr1'.tif", as(tif) replace
 
 
-
+cap drop tc
 bysort month: egen tc=total(count)
 gen prob=count/tc
-xtline prob, xline($cmin)
+
+xtline prob if inlist(month,8,9), xline($cmin) i(open) t(lng)
+
 graph export "${my_images_vintage}/cod_size_classP_OPEN_SPLIT`yr1'.tif", as(tif) replace
 
 
@@ -270,13 +281,13 @@ save "${BLAST_DIR}/haddock_size_class_ANNUAL`yr1'.dta", replace
 
 replace count=count/1000
 label var count "count 1000s"
-xtline count, xline($hmin)
+xtline count if month==9, xline($hmin) subtitle("Averaged across all months")
 graph export  "${my_images_vintage}/haddock_size_class_ANNUAL`yr1'.tif", as(tif) replace
 
 
 
 bysort month: egen tc=total(count)
 gen prob=count/tc
-xtline prob, xline($hmin)
+xtline prob if month==9, xline($hmin) subtitle("Averaged across all months")
 graph export "${my_images_vintage}/haddock_size_classP_ANNUAL`yr1'.tif", as(tif) replace
 
