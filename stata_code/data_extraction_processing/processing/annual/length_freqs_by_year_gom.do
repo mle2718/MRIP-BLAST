@@ -131,15 +131,16 @@ replace area_s="GOM" if st==23 | st==33
 replace area_s="GOM" if st==25 & strmatch(stock_region_calc,"NORTH")
 replace area_s="GBS" if st==25 & strmatch(stock_region_calc,"SOUTH")
 
- /* classify catch into the things I care about (common==$mycommon) and things I don't care about "ZZZZZZZZ" use the id_code*/
+ /* classify catch into the things I care about (common==$mycommon) and things I don't care about "ZZZZZZZZ" */
  gen common_dom="Z"
 if strmatch("$my_common","atlanticcod")==1{
-  replace common_dom="COD" if strmatch(sp_code,"8791030402")
+  replace common_dom="C" if strmatch(sp_code,"8791030402")
  }
  
  if strmatch("$my_common","haddock")==1{
-  replace common_dom="HAD" if strmatch(sp_code,"8791031301")
+  replace common_dom="H" if strmatch(sp_code,"8791031301")
  }
+
 
  
 tostring wave, gen(w2)
@@ -176,6 +177,12 @@ replace l_in_bin=0 if strmatch(common_dom, "Z")==1
 
 sort year2 area_s w2 strat_id psu_id id_code common_dom
 svyset psu_id [pweight= wp_size], strata(var_id) singleunit(certainty)
+
+/* use unweighted for atlantic cod lengths */
+if "$my_common"=="atlanticcod"{
+	svyset psu_id, strata(var_id) singleunit(certainty)
+}
+
 
  
 local myv l_in_bin
