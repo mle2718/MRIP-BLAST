@@ -133,7 +133,7 @@ svyset psu_id [pweight= wp_catch], strata(var_id) singleunit(certainty)
 
  
 local myvariables tot_cat claim harvest release
-local i=1
+local i=0
 /* total with over(<overvar>) requires a numeric variable
 
 
@@ -141,15 +141,15 @@ local i=1
  */
 
 foreach var of local myvariables{
+	local ++i 
+
 	svy: total `var', over(my_dom_id)
 	
 	mat b`i'=e(b)'
 	mat colnames b`i'=`var'
 	mat V=e(V)
 
-	local ++i 
 }
-local --i
 sort year my_dom_id
 duplicates drop my_dom_id, force
 keep my_dom_id year area_s month common_dom
