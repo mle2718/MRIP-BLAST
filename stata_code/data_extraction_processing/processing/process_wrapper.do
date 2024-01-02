@@ -30,9 +30,7 @@ global BLAST_DIR "${BLAST_root}/cod_haddock_fy2024/source_data/mrip"
 
 
 
-/*this computes calendar year estimates, which you don't really use
-do "$processing_code/batch_file_to_process_annual_mrip_data.do"
- */
+
  
  
 /*this computes monthly estimates*/
@@ -65,6 +63,23 @@ do "$processing_code/monthly/joint_catch_frequencies.do"
 */
 
 /* Write to a html file.*/
+
+
+
+/*this computes calendar year estimates, which you don't really use */
+do "$processing_code/batch_file_to_process_annual_mrip_data.do"
+
+
+
+
+/*this computes calendar year estimates, which you don't really use */
+do "$processing_code/batch_file_to_process_OpenClose_mrip_data.do"
+
+
+
+
+
+
 
 global this_working_year 2023
 dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
