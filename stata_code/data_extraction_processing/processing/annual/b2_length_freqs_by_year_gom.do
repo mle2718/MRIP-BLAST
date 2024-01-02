@@ -167,6 +167,13 @@ replace l_in_bin=0 if strmatch(common_dom, "Z")==1
 sort year w2 strat_id psu_id id_code
 svyset psu_id [pweight= wp_size], strata(var_id) singleunit(certainty)
 
+
+/* use unweighted for atlantic cod lengths */
+if "$my_common"=="atlanticcod"{
+	svyset psu_id, strata(var_id) singleunit(certainty)
+}
+ 
+ 
  
 local myv l_in_bin
 
