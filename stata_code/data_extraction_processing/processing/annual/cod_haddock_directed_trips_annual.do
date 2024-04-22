@@ -201,10 +201,12 @@ svyset psu_id [pweight= wp_int], strata(var_id) singleunit(certainty)
 preserve
 sort  my_dom_id  year strat_id psu_id id_code
 local myvariables dtrip
-local i=1
+local i=0
 /* total with over(<overvar>) requires a numeric variable */
 
 foreach var of local myvariables{
+	local ++i 
+
 	svy: total `var', over(my_dom_id)
 	
 	mat b`i'=e(b)'
@@ -213,9 +215,7 @@ foreach var of local myvariables{
 	mat sub`i'=vecdiag(V)'
 	mat colnames sub`i'=variance
 
-	local ++i 
 }
-local --i
 sort my_dom_id year 
 duplicates drop my_dom_id, force
 keep my_dom_id year area_s month dom_id

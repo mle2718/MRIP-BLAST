@@ -16,10 +16,13 @@ if strmatch("$user","minyangWin"){
 /* setup directories */
 global code_dir "${project_dir}/stata_code"
 global working_data "${project_dir}/working_data"
+global my_annualdir "${data_main}/MRIP_$vintage_string/annual"
 global output_dir "${project_dir}/output"
 global this_working_year 2023
 global last_year = $this_working_year - 1
-global two_years = $this_working_year - 2  
+global two_years = $this_working_year - 2 
+global BLAST_DIR "${BLAST_root}/cod_haddock_fy2024/source_data/mrip"
+ 
 dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
 
  ---> 
@@ -29,12 +32,46 @@ dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summarie
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2023_12_18
+global vintage_string 2024_01_02
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
-
+global my_annualdir "${data_main}/MRIP_$vintage_string/annual"
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
+global BLAST_DIR "${BLAST_root}/cod_haddock_fy2024/source_data/mrip"
 local my_common1 "atlanticcod"
 local my_common2 "haddock"
+
+
+
+/* Here are some parameters */
+global mt_to_kilo=1000
+global kilo_to_lbs=2.20462262
+global cm_to_inch=0.39370787
+global mortality_release=0.15
+
+
+
+/* l-W is updated to be consistent with PDB 
+These are the length-weight relationships for Cod and Haddock
+GOM Cod Formula:
+Wlive (kg) = 0.000005132·L(fork cm)3.1625 (p < 0.0001, n=4890)
+
+http://www.nefsc.noaa.gov/publications/crd/crd0903/
+Haddock Weight length formula 
+Annual: Wlive (kg) = 0.000009298·L(fork cm)3.0205 (p < 0.0001, n=4890)
+GROUNDFISH ASSESSMENT UPDATES 2012 page 181
+
+Fork length and total length are equivalentfor haddock and haddock*/
+
+
+global cod_lwa 0.000005132
+global cod_lwb 3.1625
+global had_lwa 0.000009298
+global had_lwe 3.0205
+global lngcat_offset_cod 0.5
+global lngcat_offset_haddock 0.5
+
+
+
 
 /*global this_working_year = 2023 */
 global last_year = $this_working_year - 1
@@ -56,7 +93,7 @@ global hadd_recACL2023=610
 global cod_recACL2023=192
 
 
-global mrip_vintage "2023_12_18"
+global mrip_vintage "2024_01_02"
 
 global hadd_recACL2024=759
 global cod_recACL2024=192
@@ -483,7 +520,7 @@ list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_
 <</dd_do>>
 ~~~~
 
-
+These weights are computed using the monthly length distributions from MRIP. That data is a little thin.
 
 
 ~~~~
@@ -527,11 +564,39 @@ format ab1_count b2_count %10.0fc
 
 keep if year==$this_working_year
 <</dd_do>>
-<<dd_do>>
 
+
+<<dd_do>>
 list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_per_fish, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
 <</dd_do>>
 ~~~~
+
+
+
+### These weights are computed using the length distribution of catch for the Open and Closed periods separately
+
+~~~~
+<<dd_do>>
+
+/* load in total catch */
+use "${my_annualdir}/atlanticcod_weights_OpenClose_${this_working_year}.dta", replace
+list year month ab1mt b2mt b2dead_mt ab1_count b2_count, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
+<</dd_do>>
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -707,6 +772,124 @@ list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_
 ~~~~
 
 
+
+
+
+### These weights are computed using the annual length distribution of catch
+
+~~~~
+<<dd_do:quietly>>
+
+
+
+/* load in total catch */
+
+
+
+use "${BLAST_DIR}/haddock_size_class_ANNUAL${this_working_year}.dta", replace
+/*lngcat fishing_year count month*/
+drop fishing_year
+
+bysort month: egen t=total(count)
+gen prob=count/t
+keep month lngcat prob
+
+tempfile lengths
+save `lengths'
+
+
+
+
+use ${data_main}/MRIP_${vintage_string}\monthly\haddock_catch_${this_working_year}.dta
+gen landings=claim+harvest
+keep year month landings release
+destring month, replace
+merge 1:m month using `lengths', keep(1 3)
+
+
+gen count_release=prob*release
+gen count_landings=prob*landings
+
+
+collapse (sum) count_release count_landings, by(year month lngcat)
+/* compute weights */
+
+
+/*
+Spring (waves 1, 2, 3) small (<50cm, <=19inches) 0.321
+Spring (waves 1, 2, 3) large (>=50cm, >19inches) 0.113
+Fall (waves 4, 5, 6) small (<50cm, <=19inches) 0.742
+Fall (waves 4, 5, 6) large (>=50cm, >19inches) 0.459
+*/
+
+gen discard_mortality=.113 if month<=6 & lngcat>19
+replace discard_mortality=.459 if month>6 & lngcat>19
+
+replace discard_mortality=.321 if month<=6 & lngcat<=19
+replace discard_mortality=.742 if month>6 & lngcat<=19
+
+
+
+
+/* l_in_bin from MRIP is length of catch, rounded down to the nearest inch */
+
+gen weight_per_fish= $kilo_to_lbs*$had_lwa*((lngcat+.5)/$cm_to_inch)^$had_lwe
+gen landed_weight=weight_per_fish*count_landings
+gen released_weight=weight_per_fish*count_release
+
+gen b2dead_weight=weight_per_fish*discard_mortality*count_release
+
+gen b2dead_count=discard_mortality*count_release
+
+collapse (sum) count_release count_landings landed_weight released_weight b2dead_count b2dead_weight, by(year month)
+
+
+gen ab1_lbs_per_fish=landed_weight /count_landings 
+gen b2_lbs_per_fish=released_weight/count_release 
+
+
+replace landed_weight=landed_weight/($mt_to_kilo*$kilo_to_lbs)
+replace released_weight=released_weight/($mt_to_kilo*$kilo_to_lbs)
+replace b2dead_weight=b2dead_weight/($mt_to_kilo*$kilo_to_lbs)
+
+
+rename landed_weight ab1mt 
+rename released_weight b2mt 
+
+rename count_landings ab1_count 
+rename count_release  b2_count 
+
+
+format ab1_lbs_per_fish b2_lbs_per_fish %4.3fc
+
+format ab1_count b2_count b2dead_count %10.0fc
+
+format b2mt ab1mt b2dead_weight %6.1fc
+
+<</dd_do>>
+<<dd_do>>
+
+list year month ab1mt b2mt b2dead_weight ab1_count b2_count b2dead_count, abbreviate(16) sum(ab1mt b2mt b2dead_weight ab1_count b2_count b2dead_count)
+<</dd_do>>
+~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Length distributions for haddock landed. Just the Fish in the 15-19" range. There were no B2's measured on Private boats, so this assumes the B2's on private boats is similar to the B2s on ForHire and Charter vessels.
 
 
@@ -748,12 +931,10 @@ There were no B2's measured on Private boats, so I've set the length distributio
 
 <<dd_do:quietly>>
 
-global mode_vintage 2023_11_30
+global mode_dir "${data_main}/MRIP_${vintage_string}/mode"
 
-global mode_dir "${data_main}/MRIP_$mode_vintage/mode"
-
-use "${mode_dir}/haddock_size_mode_class_${working_year}.dta", clear
-keep if year==$working_year
+use "${mode_dir}/haddock_size_mode_class_${this_working_year}.dta", clear
+keep if year==$this_working_year
 rename lngcat inches
 sort mode year month inches
 

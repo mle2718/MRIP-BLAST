@@ -1,4 +1,4 @@
- /* This is a file that produces a dataset that contains #of fish encountered per trip.
+/* This is a file that produces a dataset that contains #of fish encountered per trip.
 This is a port of Scott's "cod_domain_length_freqs_by_wave_gom_2013.sas"
 
 This is a template program for estimating length frequencies
@@ -17,7 +17,7 @@ Required input datasets:
 It looks like we also need to port cod_domain_length_freqs_b2_by_wave_gom_2013 as well 
 
 There will be one output per variable and year in working directory:
-"$my_common`myv'_a1b1$working_year.dta"
+"$my_common`myv'_b2_OpenClose_$working_year.dta"
 
 
 
@@ -28,8 +28,10 @@ COMPUTE totals and std deviations for cod catch
 
  */
  clear
-
  mata: mata clear
+
+
+
 
 tempfile tl1 sl1
 
@@ -37,6 +39,7 @@ foreach file in $triplist{
 	append using ${data_raw}/`file'
 }
 capture drop $drop_conditional
+
 
 replace var_id=strat_id if strmatch(var_id,"")
 sort year strat_id psu_id id_code
@@ -61,8 +64,8 @@ sort year strat_id psu_id id_code
 save `tl1'
 clear
 
- 
-foreach file in $sizelist{
+
+foreach file in $b2list{
 	append using ${data_raw}/`file'
 }
 cap drop $drop_conditional
@@ -94,8 +97,6 @@ cap drop $drop_conditional
 }
 
 sort year strat_id psu_id id_code
-replace var_id=strat_id if strmatch(var_id,"")
-
 replace common=subinstr(lower(common)," ","",.)
 save `sl1'
 
@@ -141,6 +142,7 @@ if strmatch("$my_common","atlanticcod")==1{
   replace common_dom="H" if strmatch(sp_code,"8791031301")
  }
 
+ 
 
  
 tostring wave, gen(w2)
@@ -153,10 +155,8 @@ drop mymo
 
 tostring year, gen(myy)
 
-gen my_dom_id_string=common_dom+"_"+area_s+"_"+myy
 
-replace my_dom_id_string=subinstr(ltrim(rtrim(my_dom_id_string))," ","",.)
-encode my_dom_id_string, gen(my_dom_id)
+
 
 /* l_in_bin already defined
 gen l_in_bin=floor(lngth*0.03937) */
@@ -165,25 +165,26 @@ gen l_in_bin=floor(lngth*0.03937) */
 replace l_in_bin=0 if strmatch(common_dom, "Z")==1
 
 
+sort year w2 strat_id psu_id id_code
 
-
-
-
-
-
-
-
-
-
-sort year2 area_s w2 strat_id psu_id id_code common_dom
-svyset psu_id [pweight= wp_size], strata(var_id) singleunit(certainty)
 
 /* use unweighted for atlantic cod lengths */
 if "$my_common"=="atlanticcod"{
 	svyset psu_id, strata(var_id) singleunit(certainty)
+	gen open=inlist(month,"9","10")
+
+}
+if "$my_common"=="haddock"{
+	svyset psu_id [pweight= wp_size], strata(var_id) singleunit(certainty)
+	gen open=!inlist(month,"3")
+
 }
 
+tostring open, gen(myo)
 
+gen my_dom_id_string=common_dom+"_"+area_s+"_"+myo
+
+ 
  
 local myv l_in_bin
 
@@ -220,17 +221,22 @@ local myv l_in_bin
 	
 	foreach var of varlist *GOM*{
 	tokenize `var', parse("_")
-	rename `var' `3'`1'
+	rename `var' `3'_`5'
 	}
-	rename GOM count
+	reshape long GOM_, i(year l_in_bin) j(oo)
+	rename GOM_ count
+	gen str6 open="OPEN" if oo==1
+	replace open="CLOSED" if oo==0
 	
-	sort year l_in_bin
-	order year l_in_bin
+	sort year open l_in_bin
+	order year open l_in_bin
+	drop oo
 	
 		
-	save "$my_outputdir/$my_common`myv'_a1b1_annual_${working_year}.dta", replace
+	save "$my_outputdir/$my_common`myv'_b2_OpenClose_${working_year}.dta", replace
 
-clear
+
+
 
 
 

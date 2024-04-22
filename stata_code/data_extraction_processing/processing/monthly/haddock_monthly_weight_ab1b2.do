@@ -1,10 +1,20 @@
 use "${data_main}/MRIP_${vintage_string}/monthly/haddock_b2_counts_${working_year}.dta", clear
 
-gen discard_mortality=.113 if month<=6 & l_in_bin>=20
-replace discard_mortality=.459 if month>6 & l_in_bin>=20
+gen discard_mortality=.113 if month<=6 & l_in_bin>19
+replace discard_mortality=.459 if month>6 & l_in_bin>19
 
-replace discard_mortality=.321 if month<=6 & l_in_bin<20
-replace discard_mortality=.742 if month>6 & l_in_bin<20
+replace discard_mortality=.321 if month<=6 & l_in_bin<=19
+replace discard_mortality=.742 if month>6 & l_in_bin<=19
+
+
+
+
+/*
+Spring (waves 1, 2, 3) small (<50cm, <=19inches) 0.321
+Spring (waves 1, 2, 3) large (>=50cm, >19inches) 0.113
+Fall (waves 4, 5, 6) small (<50cm, <=19inches) 0.742
+Fall (waves 4, 5, 6) large (>=50cm, >19inches) 0.459
+*/
 
 tempfile b2_adj
 save `b2_adj', replace
@@ -45,14 +55,14 @@ drop if l_in_bin==0
 gen weight_per_fish= $kilotolb*$hada*((l_in_bin+.5)/$cmtoinch)^$hade
 
 
-gen ab1weight=round(ab1_count)*weight_per_fish
-gen b2weight=round(b2_count)*weight_per_fish
+gen ab1weight=ab1_count*weight_per_fish
+gen b2weight=b2_count*weight_per_fish
 
 keep if year==$working_year
 
 drop if l_in_bin==0
 
-gen b2weight_dead=round(b2_count)*weight_per_fish*discard_mortality
+gen b2weight_dead=b2_count*weight_per_fish*discard_mortality
 
 collapse (sum) ab1weight b2weight b2weight_dead ab1_count b2_count , by(year month)
 

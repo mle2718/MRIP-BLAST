@@ -83,25 +83,6 @@ cap drop $drop_conditional after loading in the catchlist or sizelist files
 global drop_conditional 
 
 
-
-foreach sp in atlanticcod haddock{
-	global my_common `sp'
-		
-	if "$my_common"=="atlanticcod"{
-	   global drop_conditional `"if id_code=="1757420210428005"  "'
-	}
-	else {
-    global drop_conditional 
-	}
-
-
-	do "${processing_code}/annual/domain_catch_frequencies_gom_annual.do"
-	clear
-}
-
-
-
-
 /* catch totals  -- these are done for all 3 years at once*/
 
 global my_common "atlanticcod"
@@ -114,18 +95,30 @@ global my_common "atlanticcod"
     global drop_conditional 
 	}
 
+do "${processing_code}/annual/domain_cod_Open_Close_catch_totals.do"
 
-do "${processing_code}/annual/domain_cod_annual_catch_totals.do"
-
-
-use "$my_outputdir/atlanticcod_catch_annual_$working_year.dta", clear
-keep year tot_cat claim harvest release
+use "$my_outputdir/atlanticcod_catch_OpenClose_$working_year.dta", clear
+keep year open tot_cat claim harvest release
 rename claim a
 rename harvest b1
 rename release b2
 rename tot_cat tot_catch
 gen landings=a+b1
-save "$my_outputdir/atlanticcod_landings_annual_$working_year.dta", replace
+save "$my_outputdir/atlanticcod_landings_OpenClose_$working_year.dta", replace
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 global my_common "haddock"
 	
 	if "$my_common"=="atlanticcod"{
@@ -136,24 +129,17 @@ global my_common "haddock"
 	}
 
 
-do "${processing_code}/annual/domain_haddock_annual_catch_totals.do"
+do "${processing_code}/annual/domain_haddock_Open_Close_catch_totals.do"
 
 
-
-
-
-use "$my_outputdir/haddock_catch_annual_$working_year.dta", clear
-keep year tot_cat claim harvest release
+use "$my_outputdir/haddock_catch_OpenClose_$working_year.dta", clear
+keep year open tot_cat claim harvest release
 rename claim a
 rename harvest b1
 rename release b2
 rename tot_cat tot_catch
 gen landings=a+b1
-save "$my_outputdir/haddock_landings_annual_$working_year.dta", replace
-
-
-
-
+save "$my_outputdir/haddock_landings_OpenClose_$working_year.dta", replace
 
 
 
@@ -177,28 +163,24 @@ foreach sp in atlanticcod haddock{
 	}
 
 
-	do "${processing_code}/annual/length_freqs_by_year_gom.do"
+	do "${processing_code}/annual/length_freqs_by_Open_Close_gom.do"
+
 	clear
 }
 
-
 /*stack together multiple, cleanup extras and delete */
-local cod_wave_ab1: dir "$my_outputdir" files "atlanticcodl_in_bin_a1b1_annual*.dta"
+local cod_wave_ab1: dir "$my_outputdir" files "atlanticcodl_in_bin_a1b1_OpenClose*.dta"
 
 foreach file of local cod_wave_ab1{
 	clear
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
-save "$my_outputdir/cod_ab1_annual_$working_year.dta", replace
-
-
-
-
+save "$my_outputdir/cod_ab1_OpenClose_$working_year.dta", replace
 
 
 /*stack together multiple, cleanup extras and delete */
-local haddock_wave_ab1: dir "$my_outputdir" files "haddockl_in_bin_a1b1_annual*.dta"
+local haddock_wave_ab1: dir "$my_outputdir" files "haddockl_in_bin_a1b1_OpenClose*.dta"
 
 foreach file of local haddock_wave_ab1{
 	clear
@@ -206,7 +188,7 @@ foreach file of local haddock_wave_ab1{
 	append using ${my_outputdir}/`file'
 	! rm ${my_outputdir}/`file'
 }
-save "$my_outputdir/haddock_ab1_annual_$working_year.dta", replace
+save "$my_outputdir/haddock_ab1_OpenClose_$working_year.dta", replace
 
 
 /* B2 length frequencies per wave*/
@@ -222,16 +204,15 @@ foreach sp in atlanticcod haddock{
 	}
 
 
-	do "${processing_code}/annual/b2_length_freqs_by_year_gom.do"
+	do "${processing_code}/annual/b2_length_freqs_by_Open_Close_gom.do"
+
+	
 }
-
-
-
 
 /*stack these into a single dataset */
 clear
-local cod_wave_b2: dir "$my_outputdir" files "atlanticcodl_in_bin_b2_annual*.dta"
-local haddock_wave_b2: dir "$my_outputdir" files "haddockl_in_bin_b2_annual_*.dta"
+local cod_wave_b2: dir "$my_outputdir" files "atlanticcodl_in_bin_b2_OpenClose*.dta"
+local haddock_wave_b2: dir "$my_outputdir" files "haddockl_in_bin_b2_OpenClose*.dta"
 
 clear
 foreach file of local cod_wave_b2{
@@ -241,7 +222,7 @@ foreach file of local cod_wave_b2{
 }
 
 
-save "$my_outputdir/cod_b2_annual_$working_year.dta", replace
+save "$my_outputdir/cod_b2_OpenClose_$working_year.dta", replace
 	clear
 foreach file of local haddock_wave_b2{
 
@@ -249,7 +230,22 @@ foreach file of local haddock_wave_b2{
 	! rm ${my_outputdir}/`file'
 }
 
-save "$my_outputdir/haddock_b2_annual_$working_year.dta", replace
+save "$my_outputdir/haddock_b2_OpenClose_$working_year.dta", replace
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -257,15 +253,9 @@ save "$my_outputdir/haddock_b2_annual_$working_year.dta", replace
 I think the haddock one wokrs, just need to pull over the changes to the cod one.
 */
 /* join the b2 length data with the total number of released to get the length distribution for the number of fish released */
-do "${processing_code}/annual/process_b2_haddock_annual.do"
 
-
-
-do "${processing_code}/annual/process_b2_cod_annual.do"
-
-
-
-do "${processing_code}/annual/cod_haddock_directed_trips_annual.do"
+do "${processing_code}/annual/process_b2_haddock_OpenClose.do"
+do "${processing_code}/annual/process_b2_cod_OpenClose.do"
 
 
 

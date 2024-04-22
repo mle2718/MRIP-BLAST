@@ -1,7 +1,7 @@
 /* after running do $BLAST_MRIP */
 /* get the mass location data from oracle */
 
-*do ${extraction_code}/get_ma_allocation.do
+do ${extraction_code}/get_ma_allocation.do
 
 
 /* copying over partial years of data */

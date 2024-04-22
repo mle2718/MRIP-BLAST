@@ -120,13 +120,18 @@ tostring wave, gen(w2)
 tostring year, gen(year2)
 tostring year, gen(myy)
 
-*gen my_dom_id_string=year2+area_s+"_"+w2+"_"+common_dom
-gen my_dom_id_string=year2+area_s+"_"+myy+"_"+common_dom
+
+
+gen open=inlist(month,"09","10")
+tostring open, gen(myo)
+
+gen my_dom_id_string=year2+"_"+myo+"_"+area_s+"_"+myy+"_"+common_dom
 
 replace my_dom_id_string=ltrim(rtrim(my_dom_id_string))
 encode my_dom_id_string, gen(my_dom_id)
 replace wp_catch=0 if wp_catch<=0
 sort year my_dom_id
+
 
 
 svyset psu_id [pweight= wp_catch], strata(var_id) singleunit(certainty)
@@ -162,9 +167,16 @@ drop if strmatch(common_dom,"zzzzzz")
 keep if strmatch(area_s,"GOM")
 sort year area_s month common_dom
 drop month
+decode my_dom_id, gen(my_dom_id_string)
+split my_dom_id_string, gen(stub) parse("_")
 
 
-save "$my_outputdir/`my_common'_catch_annual_$working_year.dta", replace
+	gen str6 open="OPEN" if stub2=="1"
+	replace open="CLOSED" if stub2=="0"
+	drop stub*
+
+
+save "$my_outputdir/`my_common'_catch_OpenClose_$working_year.dta", replace
 
 
 

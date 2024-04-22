@@ -11,7 +11,9 @@ COMPUTE totals and std deviations for cod catch
  */
  mata: mata clear
 
-local my_common $species1
+local my_common $species2
+
+
 tempfile tl1 cl1
 
 clear
@@ -40,8 +42,8 @@ sort year strat_id psu_id id_code
 		}
 }
 save `tl1'
-
 clear
+
 
 foreach file in $catchlist{
 	append using ${data_raw}/`file'
@@ -78,9 +80,12 @@ replace wp_catch=wp_int if wp_catch==.
 sort year strat_id psu_id id_code
 replace common=subinstr(lower(common)," ","",.)
 save `cl1'
+
 use `tl1'
 merge 1:m year wave strat_id psu_id id_code using `cl1', keep(3)
 drop _merge
+/*ONLY keep trips for which there was catch>0 */
+
 
 /* THIS IS THE END OF THE DATA MERGING CODE */
 
@@ -120,13 +125,19 @@ tostring wave, gen(w2)
 tostring year, gen(year2)
 tostring year, gen(myy)
 
-*gen my_dom_id_string=year2+area_s+"_"+w2+"_"+common_dom
-gen my_dom_id_string=year2+area_s+"_"+myy+"_"+common_dom
+
+
+gen open=!inlist(month,"03")
+tostring open, gen(myo)
+
+gen my_dom_id_string=year2+"_"+myo+"_"+area_s+"_"+myy+"_"+common_dom
 
 replace my_dom_id_string=ltrim(rtrim(my_dom_id_string))
 encode my_dom_id_string, gen(my_dom_id)
 replace wp_catch=0 if wp_catch<=0
 sort year my_dom_id
+svyset psu_id [pweight= wp_int], strata(strat_id) singleunit(certainty)
+/*svyset psu_id [pweight= wp_int], strata(strat_id) singleunit(certainty) */
 
 
 svyset psu_id [pweight= wp_catch], strata(var_id) singleunit(certainty)
@@ -134,15 +145,14 @@ svyset psu_id [pweight= wp_catch], strata(var_id) singleunit(certainty)
  
 local myvariables tot_cat claim harvest release
 local i=0
-/* total with over(<overvar>) requires a numeric variable
 
 
+/* total with over(<overvar>) requires a numeric variable 
 
- */
+*/
 
 foreach var of local myvariables{
 	local ++i 
-
 	svy: total `var', over(my_dom_id)
 	
 	mat b`i'=e(b)'
@@ -162,9 +172,13 @@ drop if strmatch(common_dom,"zzzzzz")
 keep if strmatch(area_s,"GOM")
 sort year area_s month common_dom
 drop month
+decode my_dom_id, gen(my_dom_id_string)
+split my_dom_id_string, gen(stub) parse("_")
 
 
-save "$my_outputdir/`my_common'_catch_annual_$working_year.dta", replace
+	gen str6 open="OPEN" if stub2=="1"
+	replace open="CLOSED" if stub2=="0"
+	drop stub*
 
 
-
+save "$my_outputdir/`my_common'_catch_OpenClose_$working_year.dta", replace
