@@ -14,14 +14,7 @@ global user minyangWin;
 if strmatch("$user","minyangWin"){;
 	global my_projdir "V:/READ-SSB-Lee-MRIP-BLAST";
 	global BLAST_Data "C:/Users/Min-Yang.Lee/Documents/READ-SSB-Lee-BLAST";
-	global oracle_cxn " $mysole_conn";
-
-};
-
-
-if strmatch("$user","minyangNix"){;
-	global my_projdir "${myroot}/BLAST/READ-SSB-Lee-MRIP-BLAST";
-	global BLAST_Data "$[myroot}/BLAST/projects/READ-SSB-Lee-BLAST";
+	global mrip_estim_pub_2018 "A:/products/mrip_estim/Public_data_cal2018";
 
 };
 
@@ -68,8 +61,7 @@ global my_tables "${my_projdir}/tables" ;
 /* add the programs in $my_adopath to the adopath*/
 adopath + "$my_adopath";
 
-/* older for location of mrip data */
-global mrip_estim_pub_2018 "products/mrip_estim/Public_data_cal2018";
+/* folder for location of mrip data */
 
 
 /*set the date field */

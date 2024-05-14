@@ -4,7 +4,7 @@ This is code to copy over the sas7bdat files as dta files. It relies on stat tra
 
 MRIP data is stored in  
 "smb://net/mrfss/products/mrip_estim/Public_data_cal2018"
-Windows, just mount \\net.nefsc.noaa.gov\mrfss to M:\
+Windows, just mount \\net.nefsc.noaa.gov\mrfss to A:\
 
 */
 /*Change this local to the YYYYW that you want to get*/
@@ -13,15 +13,8 @@ Windows, just mount \\net.nefsc.noaa.gov\mrfss to M:\
 
 /*minyangWin */
 if strmatch("$user","minyangWin"){
-	local sourcedir "M:/$mrip_estim_pub_2018"
+	local sourcedir "A:/$mrip_estim_pub_2018"
 }
-
-
-
-if strmatch("$user","minyangNix"){
-	local sourcedir "/home/nefsc/mrfss/$mrip_estim_pub_2018"
-}
-
 
 
 
