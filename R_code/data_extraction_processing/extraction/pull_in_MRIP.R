@@ -11,12 +11,13 @@
 
 library("here")
 library("haven")
+library("tidyverse")
 library("data.table")
 here::i_am("R_code/data_extraction_processing/extraction/pull_in_MRIP.R")
 
 # running local 
 local_mrip_folder<-file.path("A:","products","mrip_estim","Public_data_cal2018")
-network_mrip_folder<-file.path("mrfss","products","mrip_estim","Public_data_cal2018")
+network_mrip_folder<-file.path("/home", "mlee","mrfss","products","mrip_estim","Public_data_cal2018")
 
 
 raw_mrip_folder<-local_mrip_folder
@@ -45,6 +46,8 @@ size_file_in<-file.path(raw_mrip_folder,paste0("size_",waves,".sas7bdat"))
   
   if(file.exists(size_file_in)==TRUE){
     len<-haven::read_sas(size_file_in)
+    len<-len %>%
+      rename_with(tolower)
     saveRDS(len,file=file.path("data_folder", "raw", paste0("size_",waves,".Rds")))
     return(len)
     }
@@ -62,6 +65,9 @@ readin_trips <- function(waves) {
   
   if(file.exists(trips_file_in)==TRUE){
     trips<-haven::read_sas(trips_file_in)
+    trips<-trips %>%
+      rename_with(tolower)
+    
     saveRDS(trips,file=file.path("data_folder", "raw", paste0("trip_",waves,".Rds")))
     return(trips)
   }
@@ -83,6 +89,9 @@ readin_catch <- function(waves) {
   
   if(file.exists(catch_file_in)==TRUE){
     catch<-haven::read_sas(catch_file_in)
+    catch<-catch %>%
+      rename_with(tolower)
+    
     saveRDS(catch,file=file.path("data_folder", "raw", paste0("catch_",waves,".Rds")))
     return(catch)
   }
@@ -109,6 +118,8 @@ readin_sizeb2 <- function(waves) {
   
   if(file.exists(size_file_in)==TRUE){
     lenb2<-haven::read_sas(size_file_in)
+    lenb2<-lenb2 %>%
+      rename_with(tolower)
     saveRDS(lenb2,file=file.path("data_folder", "raw", paste0("size_b2_",waves,".Rds")))
     return(lenb2)
   }
