@@ -25,7 +25,7 @@ raw_mrip_folder<-local_mrip_folder
 
 len_dataset<-list()
 
-year<-as.character(2021:2024)
+year<-as.character(2024:2024)
 year<-as.data.frame(year)
 waves<-as.character(1:6)
 waves<-as.data.frame(waves)
@@ -49,6 +49,7 @@ size_file_in<-file.path(raw_mrip_folder,paste0("size_",waves,".sas7bdat"))
     len<-len %>%
       rename_with(tolower)
     saveRDS(len,file=file.path("data_folder", "raw", paste0("size_",waves,".Rds")))
+    haven::write_dta(len,path=file.path("data_folder", "raw", paste0("size_",waves,".dta")), version=14)
     return(len)
     }
 }
@@ -64,12 +65,14 @@ readin_trips <- function(waves) {
   trips_file_in<-file.path(raw_mrip_folder,paste0("trip_",waves,".sas7bdat"))
   
   if(file.exists(trips_file_in)==TRUE){
-    trips<-haven::read_sas(trips_file_in)
-    trips<-trips %>%
+    trip<-haven::read_sas(trips_file_in)
+    trip<-trip %>%
       rename_with(tolower)
     
-    saveRDS(trips,file=file.path("data_folder", "raw", paste0("trip_",waves,".Rds")))
-    return(trips)
+    saveRDS(trip,file=file.path("data_folder", "raw", paste0("trip_",waves,".Rds")))
+    haven::write_dta(trip,path=file.path("data_folder", "raw", paste0("trip_",waves,".dta")), version=14)
+    
+   return(trip)
   }
 }
 
@@ -93,6 +96,8 @@ readin_catch <- function(waves) {
       rename_with(tolower)
     
     saveRDS(catch,file=file.path("data_folder", "raw", paste0("catch_",waves,".Rds")))
+    haven::write_dta(catch,path=file.path("data_folder", "raw", paste0("catch_",waves,".dta")), version=14)
+    
     return(catch)
   }
 }
@@ -121,6 +126,8 @@ readin_sizeb2 <- function(waves) {
     lenb2<-lenb2 %>%
       rename_with(tolower)
     saveRDS(lenb2,file=file.path("data_folder", "raw", paste0("size_b2_",waves,".Rds")))
+    haven::write_dta(lenb2,path=file.path("data_folder", "raw", paste0("size_b2_",waves,".dta")), version=14)
+    
     return(lenb2)
   }
 }
