@@ -13,6 +13,8 @@ library("here")
 library("haven")
 library("tidyverse")
 library("data.table")
+library("ROracle")
+
 here::i_am("R_code/data_extraction_processing/extraction/pull_in_MRIP.R")
 
 # running local 
@@ -137,6 +139,24 @@ sizeb2_dataset<-lapply(readins,readin_sizeb2)
 sizeb2_dataset2<-rbindlist(sizeb2_dataset, fill=TRUE)
 
 
+
+# This shoudl be able to pull in 
+# Pull in the MRIP_MA_SITE_LIST 
+star_dbi_ROracle <- DBI::dbConnect(dbDriver("Oracle"),id, password=novapw, dbname=nefscusers.connect.string)
+
+
+ma_site_allocation_query<-paste0("select site_id, stock_region_calc from recdbs.mrip_ma_site_list")
+ma_site_allocation<-dplyr::tbl(star_dbi_ROracle,sql(ma_site_allocation_query)) %>%
+  collect()
+
+names(ma_site_allocation) <- tolower(names(ma_site_allocation))
+
+
+dbDisconnect(star_dbi_ROracle)
+
+
+saveRDS(ma_site_allocation,file=file.path("data_folder", "raw", "ma_site_allocation.Rds"))
+haven::write_dta(ma_site_allocation,path=file.path("data_folder", "raw", "ma_site_allocation.dta"), version=14)
 
 
 
