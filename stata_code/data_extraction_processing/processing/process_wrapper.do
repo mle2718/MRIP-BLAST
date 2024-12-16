@@ -97,7 +97,7 @@ do "$processing_code/annual/cod_weights_using_OpenClose.do"
 
 
 
-global this_working_year 2023
+global this_working_year 2024
 dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summaries_${this_working_year}.html) replace
 
 
