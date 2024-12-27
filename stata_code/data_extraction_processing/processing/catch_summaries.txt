@@ -18,7 +18,7 @@ global code_dir "${project_dir}/stata_code"
 global working_data "${project_dir}/working_data"
 global my_annualdir "${data_main}/MRIP_$vintage_string/annual"
 global output_dir "${project_dir}/output"
-global this_working_year 2023
+global this_working_year 2024
 global last_year = $this_working_year - 1
 global two_years = $this_working_year - 2 
 global BLAST_DIR "${BLAST_root}/cod_haddock_fy2024/source_data/mrip"
@@ -32,7 +32,7 @@ dyndoc "$processing_code/catch_summaries.txt", saving($my_results/catch_summarie
 <<dd_do:quietly>>
 /* If you dyndoc this right after running your MRIP data processing code, you can comment this out.*/
 do $MRIP_BLAST
-global vintage_string 2024_01_02
+global vintage_string 2024_12_16
 global my_outputdir "${data_main}/MRIP_$vintage_string/monthly"
 global my_annualdir "${data_main}/MRIP_$vintage_string/annual"
 global FY_dir "${data_main}/MRIP_$vintage_string/fishing_years"
@@ -575,17 +575,6 @@ list year month ab1mt b2mt b2dead_mt ab1_count b2_count ab1_lbs_per_fish b2_lbs_
 
 ### These weights are computed using the length distribution of catch for the Open and Closed periods separately
 
-~~~~
-<<dd_do>>
-
-/* load in total catch */
-use "${my_annualdir}/atlanticcod_weights_OpenClose_${this_working_year}.dta", replace
-list year month ab1mt b2mt b2dead_mt ab1_count b2_count, abbreviate(16) sum(ab1mt b2mt b2dead_mt  ab1_count b2_count)
-<</dd_do>>
-~~~~
-
-
-
 
 
 
@@ -924,9 +913,9 @@ list year month  inches total landed pct_kept if inches>=15 & inches<=18, sepby(
 <</dd_do>>
 ~~~~
 
-Private size limit after August 15, 2023 is 17".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting at that time, 2023 nothing under 17" should be retained.
+Private size limit after August 15, 2023 is 17".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting at that time in 2023, nothing under 17" should be retained.
 
-There were no B2's measured on Private boats, so I've set the length distribution of the Private B2's to empty. There were also no ab1's measured on Private boats in April.  
+Private limit after July 24, 2023 is 18".  MRIP data rounds down to the (a 16.9" fish is reported as 16").  Starting at that time in 2024, nothing under 18" should be retained.
 
 
 <<dd_do:quietly>>
@@ -947,14 +936,15 @@ format ab1  b2 %8.0fc
 
 ~~~~
 <<dd_do>>
-list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="Private", sepby(month)
+list year month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="Private", sepby(month)
 <</dd_do>>
 ~~~~
 
 For-Hire size limit after August 15, 2023 is 18".  MRIP data rounds down to the (a 17.9" fish is reported as 17").  Starting on August 15, 2023 nothing under 18" should be retained.
+No changes for the For hire limit in 2024, it stayed at 18".
 ~~~~
 <<dd_do>>
-list month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="ForHire", sepby(month)
+list year month mode inches ab1_count b2 if inches>=15 & inches<=19 & mode=="ForHire", sepby(month)
 <</dd_do>>
 ~~~~
 
