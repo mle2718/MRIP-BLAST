@@ -25,13 +25,13 @@ capture mkdir "$modedir"
 
 
 /*this global controls a few other subfiles*/
-global this_working_year 2023
+global this_working_year 2024
 
-global process_list 2023
+global process_list 2024
 
 
 *global stacked_dir "${workdir}/stacked_monthly"
-global BLAST_DIR "${BLAST_root}/cod_haddock_fy2024/source_data/mrip"
+global BLAST_DIR "${BLAST_root}/cod_haddock_fy2025/source_data/mrip"
 
 
 

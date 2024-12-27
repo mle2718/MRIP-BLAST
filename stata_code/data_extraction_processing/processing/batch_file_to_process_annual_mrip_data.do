@@ -39,11 +39,8 @@ capture mkdir "$my_outputdir"
 /* Use these to control the years and species for which the MRIP data is polled/queried*/
 /********************************************************************************/
 /********************************************************************************/
-global working_year  2019
-global working_year  2020
-global working_year  2021
-global working_year  2022
 global working_year  2023
+global working_year  2024
 
 local year $working_year
 global wavelist 1 2 3 4 5 6

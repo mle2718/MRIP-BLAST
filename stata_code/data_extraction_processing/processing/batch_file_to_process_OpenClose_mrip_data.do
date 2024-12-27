@@ -25,7 +25,7 @@ In order to do a data update, you will need to:
 
 	CHECK for missing waves in the "ab1_lengths", catch totals, catch frequencies.
  */
-
+pause off
  
 global my_outputdir "${data_main}/MRIP_$vintage_string/annual"
 capture mkdir "$my_outputdir"
@@ -43,7 +43,7 @@ global working_year  2019
 global working_year  2020
 global working_year  2021
 global working_year  2022
-global working_year  2023
+global working_year  2024
 
 local year $working_year
 global wavelist 1 2 3 4 5 6

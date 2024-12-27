@@ -1,4 +1,4 @@
-
+pause off
 
 global cod_lwa 0.000005132
 global cod_lwb 3.1625
